@@ -2,42 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kontrol Nada NXT</title>
+    <title>Piano NXT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
     <script src="script.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .robot-group { margin-bottom: 16px; border: 1px solid #ccc; border-radius: 8px; padding: 12px; display: inline-block; min-width: 180px; }
-        .robot-group h3 { margin: 0 0 10px 0; }
-        button { margin: 4px; padding: 8px 16px; font-size: 1em; cursor: pointer; }
-        .all-group button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 24px;
+            padding: 32px;
+        }
+        h2 { font-size: 1.8em; letter-spacing: 2px; }
+        .piano-wrapper {
+            display: flex;
+            gap: 24px;
+        }
+        .nxt-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .nxt-label {
+            font-size: 0.8em;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .keys {
+            display: flex;
+            gap: 6px;
+        }
+        .key {
+            width: 80px;
+            height: 220px;
+            background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+            border: 2px solid #555;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 14px;
+            cursor: pointer;
+            color: #333;
+            box-shadow: 3px 6px 10px rgba(0,0,0,0.5);
+            user-select: none;
+            transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.06s ease;
+        }
+        .key:active, .key.pressed {
+            transform: translateY(6px);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(to bottom, #d0d0d0, #bbb);
+        }
+        .key .solfege { font-size: 1.3em; font-weight: bold; }
+        .key .note    { font-size: 0.75em; color: #888; margin-top: 4px; }
     </style>
 </head>
 <body>
-    <h2>Kontrol NXT</h2>
+    <h2>🎹 Piano NXT</h2>
 
-    <div class="robot-group">
-        <h3>NXT-1</h3>
-        <button onclick="KirimNada('DO','nxt1')">DO</button>
-        <button onclick="KirimNada('RE','nxt1')">RE</button>
-        <button onclick="KirimNada('MI','nxt1')">MI</button>
+    <div class="piano-wrapper">
+
+        <!-- NXT-1: Motor A=DO, B=RE, C=MI -->
+        <div class="nxt-group">
+            <div class="nxt-label">NXT-1 &mdash; COM9</div>
+            <div class="keys">
+                <div class="key" id="key-DO"
+                     onmousedown="pressKey('DO')"
+                     ontouchstart="pressKey('DO')" ontouchend="releaseKey('DO')" ontouchcancel="releaseKey('DO')">
+                    <span class="solfege">DO</span><span class="note">C4 · Motor A</span>
+                </div>
+                <div class="key" id="key-RE"
+                     onmousedown="pressKey('RE')"
+                     ontouchstart="pressKey('RE')" ontouchend="releaseKey('RE')" ontouchcancel="releaseKey('RE')">
+                    <span class="solfege">RE</span><span class="note">D4 · Motor B</span>
+                </div>
+                <div class="key" id="key-MI"
+                     onmousedown="pressKey('MI')"
+                     ontouchstart="pressKey('MI')" ontouchend="releaseKey('MI')" ontouchcancel="releaseKey('MI')">
+                    <span class="solfege">MI</span><span class="note">E4 · Motor C</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NXT-2: Motor A=FA, B=SOL, C=LA -->
+        <div class="nxt-group">
+            <div class="nxt-label">NXT-2 &mdash; COM10</div>
+            <div class="keys">
+                <div class="key" id="key-FA"
+                     onmousedown="pressKey('FA')"
+                     ontouchstart="pressKey('FA')" ontouchend="releaseKey('FA')" ontouchcancel="releaseKey('FA')">
+                    <span class="solfege">FA</span><span class="note">F4 · Motor A</span>
+                </div>
+                <div class="key" id="key-SOL"
+                     onmousedown="pressKey('SOL')"
+                     ontouchstart="pressKey('SOL')" ontouchend="releaseKey('SOL')" ontouchcancel="releaseKey('SOL')">
+                    <span class="solfege">SOL</span><span class="note">G4 · Motor B</span>
+                </div>
+                <div class="key" id="key-LA"
+                     onmousedown="pressKey('LA')"
+                     ontouchstart="pressKey('LA')" ontouchend="releaseKey('LA')" ontouchcancel="releaseKey('LA')">
+                    <span class="solfege">LA</span><span class="note">A4 · Motor C</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="robot-group">
-        <h3>NXT-2</h3>
-        <button onclick="KirimNada('DO','nxt2')">DO</button>
-        <button onclick="KirimNada('RE','nxt2')">RE</button>
-        <button onclick="KirimNada('MI','nxt2')">MI</button>
-    </div>
+    <script>
+        // Map keyboard keys → note names
+        var keyboardMap = { 'a':'DO', 's':'RE', 'd':'MI', 'f':'FA', 'g':'SOL', 'h':'LA' };
 
-    <!-- Tambahkan blok di atas untuk setiap NXT tambahan -->
+        var heldKeys = {};
 
-    <br>
-    <div class="robot-group all-group">
-        <h3>Semua Robot</h3>
-        <button onclick="KirimNada('DO','all')">DO</button>
-        <button onclick="KirimNada('RE','all')">RE</button>
-        <button onclick="KirimNada('MI','all')">MI</button>
-    </div>
+        function pressKey(nada) {
+            if (heldKeys[nada]) return;
+            heldKeys[nada] = true;
+            var el = document.getElementById('key-' + nada);
+            if (el) el.classList.add('pressed');
+            TekanPress(nada);
+        }
+
+        function releaseKey(nada) {
+            if (!heldKeys[nada]) return;
+            heldKeys[nada] = false;
+            var el = document.getElementById('key-' + nada);
+            if (el) el.classList.remove('pressed');
+            TekanRelease(nada);
+        }
+
+        // Single document-level mouseup releases any held key,
+        // even if the cursor moved off the key before releasing.
+        document.addEventListener('mouseup', function() {
+            Object.keys(heldKeys).forEach(function(nada) {
+                if (heldKeys[nada]) releaseKey(nada);
+            });
+        });
+
+        // Keyboard support (A S D F G H)
+        document.addEventListener('keydown', function(e) {
+            if (e.repeat) return;
+            var nada = keyboardMap[e.key.toLowerCase()];
+            if (nada) pressKey(nada);
+        });
+        document.addEventListener('keyup', function(e) {
+            var nada = keyboardMap[e.key.toLowerCase()];
+            if (nada) releaseKey(nada);
+        });
+    </script>
 </body>
 </html>
