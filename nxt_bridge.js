@@ -9,7 +9,7 @@ const { SerialPort } = require('serialport');
 // ============================================================
 const NXT_DEVICES = [
     { name: 'NXT-1', comPort: 'COM13'  },
-    { name: 'NXT-2', comPort: 'COM10' },
+    { name: 'NXT-2', comPort: 'COM14' },
 ];
 
 // Pemetaan nada piano → indeks NXT (0-based) dan port motor
