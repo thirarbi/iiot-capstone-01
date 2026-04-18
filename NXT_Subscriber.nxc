@@ -1,0 +1,22 @@
+#define MOTOR_A OUT_A
+#define MOTOR_B OUT_B
+#define MOTOR_C OUT_C
+
+void Pukul(int port) {
+    OnFwd(port, 100); Wait(100); OnRev(port, 100); Wait(100); Off(port);
+}
+
+task main() {
+    string msg;
+    PlayTone(440, 200); // Penanda NXT siap
+
+    while(true) {
+        if (ReceiveMessage(0, true, msg) == NO_ERR) {
+            // Filter nada menggunakan angka 1-8
+            if (Pos("1", msg) != -1 || Pos("4", msg) != -1 || Pos("7", msg) != -1) Pukul(MOTOR_A);
+            else if (Pos("2", msg) != -1 || Pos("5", msg) != -1 || Pos("8", msg) != -1) Pukul(MOTOR_B);
+            else if (Pos("3", msg) != -1 || Pos("6", msg) != -1) Pukul(MOTOR_C);
+        }
+        Wait(20);
+    }
+}

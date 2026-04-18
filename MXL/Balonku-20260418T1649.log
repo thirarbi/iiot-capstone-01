@@ -1,0 +1,96 @@
+2026-04-18 16:49:38,273 ERROR [Balonku]              IOUtils.java:278  | Unmapping is not supported.
+java.lang.reflect.InaccessibleObjectException: Unable to make public jdk.internal.ref.Cleaner java.nio.DirectByteBuffer.cleaner() accessible: module java.base does not "opens java.nio" to unnamed module @54bff557
+	at java.base/java.lang.reflect.AccessibleObject.throwInaccessibleObjectException(Unknown Source)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(Unknown Source)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(Unknown Source)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Unknown Source)
+	at java.base/java.lang.reflect.Method.setAccessible(Unknown Source)
+	at org.apache.pdfbox.io.IOUtils.unmapper(IOUtils.java:244)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at org.apache.pdfbox.io.IOUtils.<clinit>(IOUtils.java:69)
+	at org.apache.pdfbox.Loader.loadPDF(Loader.java:378)
+	at org.audiveris.omr.image.ImageLoading.getPdfLoader(ImageLoading.java:159)
+	at org.audiveris.omr.image.ImageLoading.getLoader(ImageLoading.java:209)
+	at org.audiveris.omr.sheet.Book.createStubs(Book.java:557)
+	at org.audiveris.omr.CLI$ProcessingTask.processBook(CLI.java:830)
+	at org.audiveris.omr.CLI$CliTask.call(CLI.java:504)
+	at org.audiveris.omr.Main.runBatchTasks(Main.java:371)
+	at org.audiveris.omr.Main.main(Main.java:260)
+	at Audiveris.main(Audiveris.java:50)
+2026-04-18 16:49:38,331 INFO [Balonku]                 Book.java:562  | 2 sheets in C:\Users\user\Documents\praktikum-iot\PDF BARU\Balonku.pdf
+2026-04-18 16:49:38,522 INFO []                 Book.java:2531 | Stored /book.xml
+2026-04-18 16:49:38,523 INFO []                 Book.java:2491 | Book stored as C:\Users\user\Documents\praktikum-iot\MXL\Balonku.omr
+2026-04-18 16:49:38,528 INFO []                 Book.java:1933 | Book reaching PAGE on sheets:[#1#2]
+2026-04-18 16:49:38,529 INFO [Balonku#1]       StepMonitoring.java:98   | LOAD
+2026-04-18 16:49:39,209 INFO [Balonku#1]            SheetStub.java:1273 | Loaded image #1 2480x3507 from C:\Users\user\Documents\praktikum-iot\PDF BARU\Balonku.pdf
+2026-04-18 16:49:39,219 INFO [Balonku#1]       StepMonitoring.java:98   | BINARY
+2026-04-18 16:49:39,862 INFO [Balonku#1]       StepMonitoring.java:98   | SCALE
+2026-04-18 16:49:39,890 INFO [Balonku#1]         ScaleBuilder.java:241  | Beam  guessed height: 16 -- 0.50 of 31 interline
+2026-04-18 16:49:39,892 INFO [Balonku#1]         ScaleBuilder.java:264  | Beam measured height: 30 -- 0.95 of [9..31] range at 53% of needed quorum
+2026-04-18 16:49:39,892 WARN [Balonku#1]         ScaleBuilder.java:293  | No reliable beam height found, guessed value: 16
+2026-04-18 16:49:39,892 INFO [Balonku#1]            ScaleStep.java:65   | Scale{ interline(31,31,32) line(3,3,3) beam(16 extra)}
+2026-04-18 16:49:39,893 INFO [Balonku#1]       StepMonitoring.java:98   | GRID
+2026-04-18 16:49:40,441 INFO [Balonku#1]       LinesRetriever.java:1500 | Global slope: 0.00000
+2026-04-18 16:49:40,482 INFO [Balonku#1]    ClustersRetriever.java:328  | Retrieved raw line clusters: 8 of sizes [5] with interline(31,31,32)
+2026-04-18 16:49:40,694 INFO [Balonku#1]            PeakGraph.java:310  | Systems: #1[1, 2] #2[3, 4] #3[5, 6] #4[7, 8]
+2026-04-18 16:49:41,202 INFO [Balonku#1]        SystemManager.java:134  | Indentation detected for system #1
+2026-04-18 16:49:41,207 INFO [Balonku#1]        SystemManager.java:779  | 1 part along 4 systems
+2026-04-18 16:49:41,208 INFO [Balonku#1]                 Book.java:545  | Created scores: [{Score 1}]
+2026-04-18 16:49:41,209 INFO [Balonku#1]       StepMonitoring.java:98   | HEADERS
+2026-04-18 16:49:41,648 INFO [Balonku#1]      BasicClassifier.java:277  | Classifier loaded XML norms.
+2026-04-18 16:49:41,654 INFO [Balonku#1]   AbstractClassifier.java:396  | Classifier data loaded from default uri jar:file:/C:/Program%20Files/Audiveris/app/audiveris.jar!/res/basic-classifier.zip
+2026-04-18 16:49:43,130 INFO [Balonku#1]       StepMonitoring.java:98   | STEM_SEEDS
+2026-04-18 16:49:43,229 INFO [Balonku#1]        StemSeedsStep.java:86   | stem(5 max:5)
+2026-04-18 16:49:43,307 INFO [Balonku#1]       StepMonitoring.java:98   | BEAMS
+2026-04-18 16:49:49,586 INFO [Balonku#1]       StepMonitoring.java:98   | LEDGERS
+2026-04-18 16:49:50,069 INFO [Balonku#1]       StepMonitoring.java:98   | HEADS
+2026-04-18 16:50:00,796 INFO [Balonku#1]        HeadSeedTally.java:235  | Scale information: HeadSeeds{NOTEHEAD_VOID[R:-0.5] NOTEHEAD_BLACK[L:-0.5,R:-0.5]}
+2026-04-18 16:50:00,797 INFO [Balonku#1]       StepMonitoring.java:98   | STEMS
+2026-04-18 16:50:02,212 INFO [Balonku#1]       StepMonitoring.java:98   | REDUCTION
+2026-04-18 16:50:02,374 INFO [Balonku#1]        ReductionStep.java:105  | Stems free length median value: 110 pixels, 3.5 interlines
+2026-04-18 16:50:02,379 INFO [Balonku#1]       StepMonitoring.java:98   | CUE_BEAMS
+2026-04-18 16:50:02,380 INFO [Balonku#1]         CueBeamsStep.java:81   | Step CUE_BEAMS is skipped because small heads switch is off
+2026-04-18 16:50:02,380 INFO [Balonku#1]       StepMonitoring.java:98   | TEXTS
+2026-04-18 16:50:03,871 INFO [Balonku#1]       StepMonitoring.java:98   | MEASURES
+2026-04-18 16:50:03,902 INFO [Balonku#1]                 Page.java:307  | 16 raw measures: [4 in system#1, 4 in system#2, 4 in system#3, 4 in system#4]
+2026-04-18 16:50:03,903 INFO [Balonku#1]       StepMonitoring.java:98   | CHORDS
+2026-04-18 16:50:03,964 INFO [Balonku#1]       StepMonitoring.java:98   | CURVES
+2026-04-18 16:50:05,481 INFO [Balonku#1]         SlursBuilder.java:240  | Slurs: 0
+2026-04-18 16:50:05,491 INFO [Balonku#1]      SegmentsBuilder.java:155  | Segments: 1
+2026-04-18 16:50:05,509 INFO [Balonku#1]       StepMonitoring.java:98   | SYMBOLS
+2026-04-18 16:50:05,866 INFO [Balonku#1]       StepMonitoring.java:98   | LINKS
+2026-04-18 16:50:05,926 INFO [Balonku#1]       StepMonitoring.java:98   | RHYTHMS
+2026-04-18 16:50:06,019 INFO [Balonku#1]        MeasureRhythm.java:1045 | Measure{#6} No timeOffset for RestChordInter#1673{(0.547/0.547) staff:3 slot#5 dur:1/8}
+2026-04-18 16:50:06,021 INFO [Balonku#1]          StackRhythm.java:224  | S2 MeasureStack#6 no correct rhythm
+2026-04-18 16:50:06,050 INFO [Balonku#1]       StepMonitoring.java:98   | PAGE
+2026-04-18 16:50:06,067 INFO [Balonku#1]                 Book.java:2550 | Book{Balonku} storing
+2026-04-18 16:50:06,128 INFO [Balonku#1]                 Book.java:2531 | Stored /book.xml
+2026-04-18 16:50:06,329 INFO [Balonku#1]           DataHolder.java:348  | Stored /sheet#1/BINARY.png
+2026-04-18 16:50:07,462 INFO [Balonku#1]                Sheet.java:1583 | Stored /sheet#1/sheet#1.xml
+2026-04-18 16:50:07,463 INFO [Balonku#1]                 Book.java:2491 | Book stored as C:\Users\user\Documents\praktikum-iot\MXL\Balonku.omr
+2026-04-18 16:50:07,470 INFO [Balonku#1]            SheetStub.java:1660 | Disposed sheet#1
+2026-04-18 16:50:07,553 INFO [Balonku#1]                 Book.java:2018 | End of Stub#1 memory: 40,495,160
+2026-04-18 16:50:07,556 INFO [Balonku#2]       StepMonitoring.java:98   | LOAD
+2026-04-18 16:50:07,581 INFO [Balonku#2]            SheetStub.java:1273 | Loaded image #2 2480x3507 from C:\Users\user\Documents\praktikum-iot\PDF BARU\Balonku.pdf
+2026-04-18 16:50:07,584 INFO [Balonku#2]       StepMonitoring.java:98   | BINARY
+2026-04-18 16:50:08,098 INFO [Balonku#2]       StepMonitoring.java:98   | SCALE
+2026-04-18 16:50:08,101 INFO [Balonku#2]         ScaleBuilder.java:241  | Beam  guessed height: 16 -- 0.50 of 31 interline
+2026-04-18 16:50:08,101 INFO [Balonku#2]         ScaleBuilder.java:264  | Beam measured height: 11 -- 0.09 of [9..31] range at 50% of needed quorum
+2026-04-18 16:50:08,102 WARN [Balonku#2]         ScaleBuilder.java:293  | No reliable beam height found, guessed value: 16
+2026-04-18 16:50:08,102 INFO [Balonku#2]            ScaleStep.java:65   | Scale{ interline(31,31,32) line(3,3,3) beam(16 extra)}
+2026-04-18 16:50:08,102 INFO [Balonku#2]       StepMonitoring.java:98   | GRID
+2026-04-18 16:50:08,155 INFO [Balonku#2]       LinesRetriever.java:1500 | Global slope: 0.00000
+2026-04-18 16:50:08,157 INFO [Balonku#2]    ClustersRetriever.java:328  | Retrieved raw line clusters: 2 of sizes [5] with interline(31,31,32)
+2026-04-18 16:50:08,158 WARN [Balonku#2]            PeakGraph.java:305  | No system found
+2026-04-18 16:50:08,159 INFO [Balonku#2]            SheetStub.java:1191 | Sheet Balonku#2 flagged as invalid.
+2026-04-18 16:50:08,160 INFO [Balonku#2]            SheetStub.java:1410 | StepException cause detected in [LOAD, BINARY, SCALE, GRID, HEADERS, STEM_SEEDS, BEAMS, LEDGERS, HEADS, STEMS, REDUCTION, CUE_BEAMS, TEXTS, MEASURES, CHORDS, CURVES, SYMBOLS, LINKS, RHYTHMS, PAGE]
+2026-04-18 16:50:08,160 INFO [Balonku#2]                 Book.java:2550 | Book{Balonku} storing
+2026-04-18 16:50:08,206 INFO [Balonku#2]                 Book.java:2531 | Stored /book.xml
+2026-04-18 16:50:08,322 INFO [Balonku#2]           DataHolder.java:348  | Stored /sheet#2/BINARY.png
+2026-04-18 16:50:08,328 INFO [Balonku#2]                Sheet.java:1583 | Stored /sheet#2/sheet#2.xml
+2026-04-18 16:50:08,328 INFO [Balonku#2]                 Book.java:2491 | Book stored as C:\Users\user\Documents\praktikum-iot\MXL\Balonku.omr
+2026-04-18 16:50:08,350 INFO [Balonku#2]            SheetStub.java:1660 | Disposed sheet#2
+2026-04-18 16:50:08,419 INFO [Balonku#2]                 Book.java:2018 | End of Stub#2 memory: 40,490,832
+2026-04-18 16:50:08,420 INFO [Balonku]                 Book.java:2025 | Book processed.
+2026-04-18 16:50:08,420 INFO [Balonku]                 Book.java:599  | Could not export since transcription did not complete successfully
+2026-04-18 16:50:08,454 INFO [Balonku]                Score.java:181  | Closing {Score 1}
