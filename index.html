@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kontrol Nada NXT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .robot-group { margin-bottom: 16px; border: 1px solid #ccc; border-radius: 8px; padding: 12px; display: inline-block; min-width: 180px; }
+        .robot-group h3 { margin: 0 0 10px 0; }
+        button { margin: 4px; padding: 8px 16px; font-size: 1em; cursor: pointer; }
+        .all-group button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h2>Kontrol NXT</h2>
+
+    <div class="robot-group">
+        <h3>NXT-1</h3>
+        <button onclick="KirimNada('DO','nxt1')">DO</button>
+        <button onclick="KirimNada('RE','nxt1')">RE</button>
+        <button onclick="KirimNada('MI','nxt1')">MI</button>
+    </div>
+
+    <div class="robot-group">
+        <h3>NXT-2</h3>
+        <button onclick="KirimNada('DO','nxt2')">DO</button>
+        <button onclick="KirimNada('RE','nxt2')">RE</button>
+        <button onclick="KirimNada('MI','nxt2')">MI</button>
+    </div>
+
+    <!-- Tambahkan blok di atas untuk setiap NXT tambahan -->
+
+    <br>
+    <div class="robot-group all-group">
+        <h3>Semua Robot</h3>
+        <button onclick="KirimNada('DO','all')">DO</button>
+        <button onclick="KirimNada('RE','all')">RE</button>
+        <button onclick="KirimNada('MI','all')">MI</button>
+    </div>
+</body>
+</html>
