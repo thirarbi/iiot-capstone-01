@@ -214,7 +214,8 @@ function applyTheme(theme) {
     e.stopPropagation();
     panel.classList.toggle('open');
   });
-  closeBtn.addEventListener('click', function () {
+  closeBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
     panel.classList.remove('open');
   });
   document.addEventListener('click', function (e) {
