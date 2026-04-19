@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NXT Xylophone - Piano Tiles</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+</head>
+<body>
+  <h1>NXT Xylophone</h1>
+  <p class="subtitle">Piano Tiles Controller &amp; Note Reader Monitor</p>
+  <div id="status" class="status disconnected">Disconnected</div>
+
+  <div class="now-playing">
+    <div class="label">NOW PLAYING</div>
+    <div class="note" id="nowPlaying">—</div>
+  </div>
+
+  <p class="section-title">Tap a key or let the Note Reader play</p>
+  <div class="piano">
+    <button class="key" data-note="DO" onclick="sendNote('DO')"><span class="kbd">A</span>DO</button>
+    <button class="key" data-note="RE" onclick="sendNote('RE')"><span class="kbd">S</span>RE</button>
+    <button class="key" data-note="MI" onclick="sendNote('MI')"><span class="kbd">D</span>MI</button>
+    <button class="key" data-note="FA" onclick="sendNote('FA')"><span class="kbd">F</span>FA</button>
+    <button class="key" data-note="SOL" onclick="sendNote('SOL')"><span class="kbd">G</span>SOL</button>
+    <button class="key" data-note="LA" onclick="sendNote('LA')"><span class="kbd">H</span>LA</button>
+    <button class="key" data-note="SI" onclick="sendNote('SI')"><span class="kbd">J</span>SI</button>
+    <button class="key" data-note="DO_TINGGI" onclick="sendNote('DO_TINGGI')"><span class="kbd">K</span>DO'</button>
+  </div>
+
+  <div class="log-container">
+    <p class="section-title">Activity Log</p>
+    <div id="log"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

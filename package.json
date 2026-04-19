@@ -1,18 +1,19 @@
 {
-  "name": "praktikum-iot",
+  "name": "iiot-capstone-01",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "IIoT Capstone - NXT Xylophone Player with Piano Tiles UI and Note Reader",
+  "main": "src/server.js",
   "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "broker": "node src/broker.js",
+    "bridge": "node src/nxt_bridge.js",
+    "note-reader": "python note-reader/main.py"
+  },
   "dependencies": {
-    "aedes": "^0.42.0",
+    "aedes": "^1.0.2",
     "mqtt": "^5.15.1",
+    "serialport": "^12.0.0",
     "websocket-stream": "^5.5.2"
   }
 }

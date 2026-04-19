@@ -9,12 +9,11 @@ from music21 import converter
 # 1. KONFIGURASI PATH & NETWORK
 # ============================================================
 AUDIVERIS_PATH = r"C:\Program Files\Audiveris\Audiveris.exe"
-BASE_DIR = r"C:\Users\user\Documents\praktikum-iot"
-PDF_FOLDER = os.path.join(BASE_DIR, "PDF BARU")
-MXL_FOLDER = os.path.join(BASE_DIR, "MXL")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+PDF_FOLDER = os.path.join(PROJECT_ROOT, "scores", "pdf")
+MXL_FOLDER = os.path.join(PROJECT_ROOT, "scores", "mxl")
 
-# IP Broker Julian (Pastikan ini IP terbaru laptop kamu)
-MQTT_BROKER = "10.213.106.37" 
+MQTT_BROKER = os.environ.get("MQTT_BROKER", "localhost")
 MQTT_TOPIC = "robot/nada"
 
 # Mapping Dasar untuk Robot (NXT-1, NXT-2, NXT-3)

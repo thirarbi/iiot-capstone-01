@@ -51,8 +51,9 @@ const serialPorts = NXT_DEVICES.map(dev => {
     return sp;
 });
 
-// 4. KONEKSI MQTT (IP Lokal Julian)
-const client = mqtt.connect('mqtt://10.213.106.37:1883');
+// 4. KONEKSI MQTT
+const BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
+const client = mqtt.connect(BROKER);
 client.on('connect', () => {
     console.log('✅ Bridge Aktif - Menunggu Nada dari Python...');
     client.subscribe('robot/nada');
@@ -76,6 +77,9 @@ client.on('message', (topic, message) => {
 
     // Gerakan: Maju -> Tunggu -> Mundur -> Stop
     safeWrite(sp, makeRunPacket(map.port, PRESS_POWER), `${note} forward`); // Maju (Pukul)
+
+    // Notify frontend that this note was actually struck
+    client.publish('robot/strike', note);
 
     setTimeout(() => {
         safeWrite(sp, makeRunPacket(map.port, -PRESS_POWER), `${note} reverse`); // Mundur (Angkat)
