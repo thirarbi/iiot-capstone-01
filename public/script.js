@@ -3,16 +3,32 @@
 // Uses the current page's hostname so it works on any machine.
 // Override by setting window.MQTT_HOST before this script loads.
 // ============================================================
-var hostname = window.MQTT_HOST || window.location.hostname || 'localhost';
-var port     = 8883;
-var clientId = 'PianoTiles_' + Math.random().toString(16).substr(2, 8);
+// Use saved broker from settings, falling back to page hostname
+var hostname = window.MQTT_HOST ||
+               (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_broker')) ||
+               window.location.hostname ||
+               'localhost';
+var port        = 8883;
 var topic       = 'robot/nada';
 var topicStrike = 'robot/strike';
 
-var mqttClient = new Paho.MQTT.Client(hostname, Number(port), clientId);
-mqttClient.onMessageArrived = onMessageArrived;
-mqttClient.onConnectionLost = onConnectionLost;
+var mqttClient = createClient(hostname);
 connect();
+
+function createClient(host) {
+  var id = 'PianoTiles_' + Math.random().toString(16).substr(2, 8);
+  var c = new Paho.MQTT.Client(host, Number(port), id);
+  c.onMessageArrived = onMessageArrived;
+  c.onConnectionLost = onConnectionLost;
+  return c;
+}
+
+function reconnectToBroker(newHost) {
+  hostname = newHost;
+  try { if (mqttClient.isConnected()) mqttClient.disconnect(); } catch (e) {}
+  mqttClient = createClient(hostname);
+  connect();
+}
 
 // ============================================================
 // Connection Management
@@ -170,3 +186,55 @@ document.addEventListener('keyup', function (e) {
   if (held.el) held.el.classList.remove('active');
   delete heldKeys[key];
 });
+
+// ============================================================
+// Settings Panel
+// ============================================================
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  localStorage.setItem('nxt_theme', theme);
+  document.querySelectorAll('input[name="theme"]').forEach(function (r) {
+    r.checked = (r.value === theme);
+  });
+}
+
+(function initSettings() {
+  var panel    = document.getElementById('settings-panel');
+  var openBtn  = document.getElementById('settings-btn');
+  var closeBtn = document.getElementById('settings-close');
+
+  // Restore saved theme
+  var savedTheme  = (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_theme')) || 'neon';
+  var savedBroker = (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_broker')) || '';
+  applyTheme(savedTheme);
+  if (savedBroker) document.getElementById('broker-input').value = savedBroker;
+
+  // Toggle panel
+  openBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    panel.classList.toggle('open');
+  });
+  closeBtn.addEventListener('click', function () {
+    panel.classList.remove('open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!panel.contains(e.target) && e.target !== openBtn) {
+      panel.classList.remove('open');
+    }
+  });
+
+  // Theme radio buttons
+  document.querySelectorAll('input[name="theme"]').forEach(function (radio) {
+    radio.addEventListener('change', function () { applyTheme(this.value); });
+  });
+
+  // Broker apply
+  document.getElementById('broker-apply').addEventListener('click', function () {
+    var newHost = document.getElementById('broker-input').value.trim();
+    if (!newHost) return;
+    localStorage.setItem('nxt_broker', newHost);
+    log('Reconnecting to broker at ' + newHost + '...', 'system');
+    reconnectToBroker(newHost);
+    panel.classList.remove('open');
+  });
+})();

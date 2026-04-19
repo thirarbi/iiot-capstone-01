@@ -4,6 +4,9 @@ A Capstone Project for TF4017 Industrial Internet of Things (IIoT) that converts
 
 The system features a **Piano Tiles web UI** for manual play and a **Note Reader** pipeline that automatically reads sheet music via Optical Music Recognition (OMR).
 
+This project is both hand-coded and Claude Code vibe-coded.
+Show some love ⭐💕
+
 ## Project Structure
 
 ```

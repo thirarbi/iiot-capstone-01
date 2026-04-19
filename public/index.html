@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 </head>
-<body>
+<body data-theme="neon">
   <h1>NXT Xylophone</h1>
   <p class="subtitle">Piano Tiles Controller &amp; Note Reader Monitor</p>
   <div id="status" class="status disconnected">Disconnected</div>
@@ -32,6 +32,47 @@
   <div class="log-container">
     <p class="section-title">Activity Log</p>
     <div id="log"></div>
+  </div>
+
+  <!-- Settings toggle button -->
+  <button id="settings-btn" title="Settings" aria-label="Open settings">&#9881;</button>
+
+  <!-- Settings panel -->
+  <div id="settings-panel" role="dialog" aria-label="Settings">
+    <div class="settings-header">
+      <span>Settings</span>
+      <button id="settings-close" aria-label="Close settings">&#x2715;</button>
+    </div>
+
+    <div class="settings-section">
+      <span class="settings-label">Theme</span>
+      <div class="theme-options">
+        <label class="theme-option">
+          <input type="radio" name="theme" value="neon" checked>
+          <span class="theme-swatch theme-swatch-neon"></span>
+          <span>Neon</span>
+        </label>
+        <label class="theme-option">
+          <input type="radio" name="theme" value="classic">
+          <span class="theme-swatch theme-swatch-classic"></span>
+          <span>Classic Piano</span>
+        </label>
+        <label class="theme-option">
+          <input type="radio" name="theme" value="midnight">
+          <span class="theme-swatch theme-swatch-midnight"></span>
+          <span>Midnight</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <label class="settings-label" for="broker-input">MQTT Broker</label>
+      <div class="broker-row">
+        <input type="text" id="broker-input" placeholder="localhost">
+        <button id="broker-apply">Apply</button>
+      </div>
+      <p class="settings-hint">WebSocket port 8883. Reconnects on Apply.</p>
+    </div>
   </div>
 
   <script src="script.js"></script>
