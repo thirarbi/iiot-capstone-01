@@ -7,6 +7,16 @@ The system features a **Piano Tiles web UI** for manual play and a **Note Reader
 This project is both hand-coded and Claude Code vibe-coded.
 Show some love ⭐💕
 
+## Preview
+<p align="center">
+  <img src="public\images\neon_preview.png" alt="Neon preview"  width=500/>
+  <img src="public\images\classic_preview.png" alt="classic preview" width=350/>
+</p>
+<p align="center">
+  <img src="public\images\xylophone_preview.png" alt="Xylophone preview" width = 600/>
+</p>
+
+
 ## Project Structure
 
 ```
