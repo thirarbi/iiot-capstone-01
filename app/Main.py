@@ -14,7 +14,7 @@ PDF_FOLDER = os.path.join(BASE_DIR, "PDF BARU")
 MXL_FOLDER = os.path.join(BASE_DIR, "MXL")
 
 # IP Broker Julian (Pastikan ini IP terbaru laptop kamu)
-MQTT_BROKER = "10.174.31.56"
+MQTT_BROKER = "10.213.106.37"
 MQTT_TOPIC = "robot/nada"
 
 # Mapping Dasar untuk Robot (NXT-1, NXT-2, NXT-3)
