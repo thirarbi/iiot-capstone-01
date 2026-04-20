@@ -1,4 +1,9 @@
 # IIoT Capstone — NXT Xylophone Player
+<div align="center"> <br>
+<img src=https://img.shields.io/badge/NXT-Mindstorm-orange?logo=lego> <img src=https://img.shields.io/badge/Node.js-16+-6DA55F?logo=node.js&logoColor=white> <img src=https://img.shields.io/badge/Audiveris-white?logo=apple%20music&logoColor=red> <br>
+<img src=JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000> <img src=https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white> <img src=https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)> <img src=https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff>
+</div>
+<br>
 
 A Capstone Project for TF4017 Industrial Internet of Things (IIoT) that converts **PDF sheet music** into physical xylophone performances using **LEGO NXT robots** (ancient 2006 tech), controlled using **MQTT**.Protocol. Is also able to send data over ITB (Bandung Institute of Technology) Engineering Physics Department's server for temporary data sending.
 
@@ -76,7 +81,7 @@ iiot-capstone-01/
 
 - **Node.js** (v16+)
 - **Python 3** with `pip`
-- **Audiveris** — installed at `C:\Program Files\Audiveris\Audiveris.exe` (configurable in `note-reader/main.py`)
+- **Audiveris** — [Github Repo](https://github.com/audiveris/audiveris) (configurable in `note-reader/main.py`)
 - **LEGO NXT bricks** paired via Bluetooth (COM ports configured in `src/nxt_bridge.js`)
 
 ## Setup
