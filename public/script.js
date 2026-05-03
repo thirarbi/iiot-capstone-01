@@ -43,6 +43,7 @@ function connect() {
 function onConnected() {
   mqttClient.subscribe(topic);
   mqttClient.subscribe(topicStrike);
+  mqttClient.subscribe('robot/score');
   setStatus(true);
   log('Connected to broker at ' + hostname + ':' + port, 'system');
 }
@@ -73,6 +74,11 @@ function onMessageArrived(message) {
     log('Motor hit: ' + note, 'received');
     highlightKey(note);
     showNowPlaying(note);
+  } else if (message.destinationName === 'robot/score') {
+    try {
+      var score = JSON.parse(note);
+      log('Score diterima: "' + score.title + '" \u2014 ' + score.notes.length + ' nada', 'system');
+    } catch (e) {}
   } else {
     log('Command: ' + note, 'system');
   }

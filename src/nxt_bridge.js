@@ -34,9 +34,6 @@ function makeStopPacket(port) {
     return Buffer.from([0x0C, 0x00, 0x80, 0x04, port, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 }
 
-// Per-motor busy flag: cegah overlap sequence pukulan pada motor yang sama
-const busyMotors = {};
-
 function safeWrite(sp, packet, label) {
     sp.write(packet, (err) => {
         if (err) console.error(`❌ Serial write error [${label}]:`, err.message);
@@ -55,39 +52,64 @@ const serialPorts = NXT_DEVICES.map(dev => {
 const BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
 const client = mqtt.connect(BROKER);
 client.on('connect', () => {
-    console.log('✅ Bridge Aktif - Menunggu Nada dari Python...');
-    client.subscribe('robot/nada');
+    console.log('✅ Bridge Aktif - Menunggu Score...');
+    client.subscribe('robot/score');  // compiled full-song packet
+    client.subscribe('robot/nada');   // manual key presses from the UI
 });
 client.on('error', (err) => console.error('❌ MQTT error:', err.message));
 
-// 5. LOGIKA PUKULAN OTOMATIS
-client.on('message', (topic, message) => {
-    const note = message.toString();
+// 5. FUNGSI PUKULAN TUNGGAL
+function strikeNote(note) {
     const map = NOTE_MAP[note];
     if (!map) return;
 
     const sp = serialPorts[map.nxt];
-    if (!sp.isOpen) return;
-
-    const motorKey = `${map.nxt}-${map.port}`;
-    if (busyMotors[motorKey]) return; // motor sedang aktif, skip
-    busyMotors[motorKey] = true;
+    if (!sp || !sp.isOpen) return;
 
     console.log(`🎹 Playing: ${note} on ${NXT_DEVICES[map.nxt].name} Motor ${map.port}`);
-
-    // Gerakan: Maju -> Tunggu -> Mundur -> Stop
-    safeWrite(sp, makeRunPacket(map.port, PRESS_POWER), `${note} forward`); // Maju (Pukul)
-
-    // Notify frontend that this note was actually struck
+    safeWrite(sp, makeRunPacket(map.port, PRESS_POWER), `${note} forward`);
     client.publish('robot/strike', note);
 
     setTimeout(() => {
-        safeWrite(sp, makeRunPacket(map.port, -PRESS_POWER), `${note} reverse`); // Mundur (Angkat)
-
+        safeWrite(sp, makeRunPacket(map.port, -PRESS_POWER), `${note} reverse`);
         setTimeout(() => {
-            safeWrite(sp, makeStopPacket(map.port), `${note} stop`); // Stop di posisi awal
-            busyMotors[motorKey] = false; // lepas flag, motor siap terima nada berikutnya
+            safeWrite(sp, makeStopPacket(map.port), `${note} stop`);
         }, HOLD_MS);
-
     }, HOLD_MS);
+}
+
+// 6. SEQUENCER — schedules all notes locally after a single score delivery
+let activeSequencer = [];  // timeout handles; cleared when a new score arrives
+
+function cancelActiveSequence() {
+    activeSequencer.forEach(clearTimeout);
+    activeSequencer = [];
+}
+
+function playScore(scorePacket) {
+    cancelActiveSequence();
+    const { title, notes } = scorePacket;
+    console.log(`🎼 Memulai: "${title}" (${notes.length} nada)`);
+
+    let elapsed = 0;
+    notes.forEach(({ note, delay_ms }) => {
+        elapsed += delay_ms;
+        const handle = setTimeout(() => strikeNote(note), elapsed);
+        activeSequencer.push(handle);
+    });
+}
+
+// 7. ROUTER PESAN
+client.on('message', (topic, message) => {
+    if (topic === 'robot/score') {
+        try {
+            const scorePacket = JSON.parse(message.toString());
+            playScore(scorePacket);
+        } catch (e) {
+            console.error('❌ Score packet tidak valid:', e.message);
+        }
+    } else if (topic === 'robot/nada') {
+        // Tombol manual dari Web UI — tetap didukung
+        strikeNote(message.toString());
+    }
 });
