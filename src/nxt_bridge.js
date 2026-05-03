@@ -3,9 +3,9 @@ const { SerialPort } = require('serialport');
 
 // 1. KONFIGURASI 3 NXT (Update COM Port Julian)
 const NXT_DEVICES = [
-    { name: 'NXT-1', comPort: 'COM16' }, // DO, RE, MI
+    { name: 'NXT-1', comPort: 'COM14' }, // DO, RE, MI
     { name: 'NXT-3', comPort: 'COM13' }, // FA, SOL, LA
-    { name: 'NXT-4', comPort: 'COM11' }, // SI, DO_TINGGI
+    { name: 'NXT-4', comPort: 'COM16' }, // SI, DO_TINGGI
 ];
 
 // Pemetaan nada ke Robot dan Port Motor (0=A, 1=B, 2=C)

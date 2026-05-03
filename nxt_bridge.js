@@ -1,8 +1,18 @@
+// ⚠️  DEPRECATED — Jangan jalankan file ini langsung!
+// File ini adalah versi lama dan TIDAK kompatibel dengan sistem saat ini.
+// Gunakan: npm run bridge  (menjalankan src/nxt_bridge.js)
+//
+// Perbedaan utama:
+//  - File ini subscribe ke 'robot/playlist' (tidak ada publisher)
+//  - src/nxt_bridge.js subscribe ke 'robot/score' (dipakai note-reader/main.py)
+//  - Broker IP di sini hardcoded (10.213.106.37), bukan localhost
+throw new Error('DEPRECATED: Jalankan "npm run bridge" untuk menggunakan src/nxt_bridge.js');
+
 const { SerialPort } = require('serialport');
 const mqtt = require('mqtt');
 
 // Update IP Broker sesuai ZBook kamu
-const client = mqtt.connect('mqtt://10.213.106.37');
+const client = mqtt.connect('mqtt://192.168.0.115');
 
 // 1. KONFIGURASI 3 NXT (Pastikan COM Port ini sesuai Device Manager)
 const NXT_DEVICES = [
