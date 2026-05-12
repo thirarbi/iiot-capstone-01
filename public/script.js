@@ -8,7 +8,7 @@ var hostname = window.MQTT_HOST ||
                (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_broker')) ||
                window.location.hostname ||
                'localhost';
-var port        = 8883;
+var port     = window.MQTT_WS_PORT || 8883;
 var topic       = 'robot/nada';
 var topicStrike = 'robot/strike';
 

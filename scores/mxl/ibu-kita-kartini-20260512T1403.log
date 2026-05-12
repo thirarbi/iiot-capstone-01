@@ -1,0 +1,5 @@
+2026-05-12 14:03:56,917 INFO [ibu-kita-kartini]                 Book.java:560  | 1 sheet in C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\pdf\ibu-kita-kartini.pdf
+2026-05-12 14:03:57,203 INFO []                 Book.java:2565 | Stored /book.xml
+2026-05-12 14:03:57,205 INFO []                 Book.java:2525 | Book stored as C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.omr
+2026-05-12 14:03:57,219 INFO []                 Book.java:1929 | Book reaching PAGE on sheets:[#1]
+2026-05-12 14:03:57,225 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LOAD

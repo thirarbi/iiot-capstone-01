@@ -49,7 +49,8 @@ const serialPorts = NXT_DEVICES.map(dev => {
 });
 
 // 4. KONEKSI MQTT
-const BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
+const MQTT_PORT = Number(process.env.MQTT_PORT || 1883);
+const BROKER    = process.env.MQTT_BROKER || `mqtt://localhost:${MQTT_PORT}`;
 const client = mqtt.connect(BROKER);
 client.on('connect', () => {
     console.log('✅ Bridge Aktif - Menunggu Score...');

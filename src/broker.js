@@ -3,8 +3,10 @@ const net = require('net')
 const http = require('http')
 const ws = require('websocket-stream')
 
-const broker_port = 1883
-const websocket_port = 8883
+const broker_port    = Number(process.env.MQTT_PORT    || 1883)
+const websocket_port = Number(process.env.MQTT_WS_PORT || 8883)
+
+module.exports = { broker_port, websocket_port }
 
 async function startBroker () {
   const aedes = new Aedes()
