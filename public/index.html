@@ -16,6 +16,14 @@
   <p class="subtitle">Piano Tiles Controller &amp; Note Reader Monitor</p>
   <div id="status" class="status disconnected">Disconnected</div>
 
+  <div class="session-controls">
+    <button id="session-toggle" data-state="idle" onclick="toggleSession()">
+      <span class="session-dot"></span>
+      <span id="session-label">Begin Session</span>
+    </button>
+    <span id="session-info"></span>
+  </div>
+
   <div class="now-playing">
     <div class="label">NOW PLAYING</div>
     <div class="note" id="nowPlaying">—</div>

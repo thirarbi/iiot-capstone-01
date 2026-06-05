@@ -116,6 +116,56 @@ h1 { font-size: 2rem; margin-bottom: 0.3rem; }
 #log div { padding: 2px 0; }
 
 /* ============================================================
+   SESSION CONTROLS
+   ============================================================ */
+.session-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+#session-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(128,128,128,0.35);
+  background: transparent;
+  color: inherit;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+}
+#session-toggle:hover { opacity: 0.85; }
+#session-toggle .session-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
+#session-toggle[data-state="active"] {
+  border-color: #d4423b;
+  background: rgba(212, 66, 59, 0.12);
+  color: #d4423b;
+}
+#session-toggle[data-state="active"] .session-dot {
+  background: #d4423b;
+  opacity: 1;
+  animation: session-pulse 1.2s infinite ease-in-out;
+}
+@keyframes session-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%      { opacity: 0.4; transform: scale(0.85); }
+}
+#session-info {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+/* ============================================================
    SETTINGS BUTTON & PANEL
    ============================================================ */
 #settings-btn {

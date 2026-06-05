@@ -44,6 +44,8 @@ function onConnected() {
   mqttClient.subscribe(topic);
   mqttClient.subscribe(topicStrike);
   mqttClient.subscribe('robot/score');
+  mqttClient.subscribe('robot/touch');
+  mqttClient.subscribe('session/status');
   setStatus(true);
   log('Connected to broker at ' + hostname + ':' + port, 'system');
 }
@@ -69,18 +71,29 @@ function onConnectionLost(resp) {
 //                 → triggers key highlight + Now Playing
 // ============================================================
 function onMessageArrived(message) {
-  var note = message.payloadString;
+  var payload = message.payloadString;
   if (message.destinationName === topicStrike) {
-    log('Motor hit: ' + note, 'received');
-    highlightKey(note);
-    showNowPlaying(note);
+    log('Motor hit: ' + payload, 'received');
+    highlightKey(payload);
+    showNowPlaying(payload);
+  } else if (message.destinationName === 'robot/touch') {
+    try {
+      var ev = JSON.parse(payload);
+      log('Touch: ' + ev.note + ' (NXT-' + ev.nxt + ' port ' + ev.port + ')', 'received');
+      highlightKey(ev.note);
+      showNowPlaying(ev.note);
+    } catch (e) {}
+  } else if (message.destinationName === 'session/status') {
+    try {
+      applySessionStatus(JSON.parse(payload));
+    } catch (e) {}
   } else if (message.destinationName === 'robot/score') {
     try {
-      var score = JSON.parse(note);
+      var score = JSON.parse(payload);
       log('Score diterima: "' + score.title + '" \u2014 ' + score.notes.length + ' nada', 'system');
     } catch (e) {}
   } else {
-    log('Command: ' + note, 'system');
+    log('Command: ' + payload, 'system');
   }
 }
 
@@ -245,3 +258,54 @@ function applyTheme(theme) {
     panel.classList.remove('open');
   });
 })();
+
+// ============================================================
+// Session Recording — see docs/session-logging.md
+// State is owned by the logger (server.js) and broadcast over
+// retained topic session/status. We only render what we receive.
+// ============================================================
+var sessionActive = false;
+
+function generateSessionId() {
+  var d = new Date();
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  return d.getFullYear()
+       + pad(d.getMonth() + 1)
+       + pad(d.getDate())
+       + '-'
+       + pad(d.getHours())
+       + pad(d.getMinutes())
+       + pad(d.getSeconds());
+}
+
+function applySessionStatus(status) {
+  sessionActive = !!status.active;
+  var btn   = document.getElementById('session-toggle');
+  var label = document.getElementById('session-label');
+  var info  = document.getElementById('session-info');
+  if (!btn) return;
+  btn.setAttribute('data-state', sessionActive ? 'active' : 'idle');
+  label.textContent = sessionActive ? 'End Session' : 'Begin Session';
+  if (sessionActive && status.session_id) {
+    info.textContent = 'recording → session-' + status.session_id + '.jsonl';
+    log('Session started: ' + status.session_id, 'system');
+  } else if (!sessionActive) {
+    if (info.textContent) log('Session ended', 'system');
+    info.textContent = '';
+  }
+}
+
+function toggleSession() {
+  if (!mqttClient.isConnected()) {
+    log('Not connected to broker', 'system');
+    return;
+  }
+  var topic   = sessionActive ? 'session/end' : 'session/begin';
+  var payload = JSON.stringify({
+    session_id: sessionActive ? undefined : generateSessionId(),
+  });
+  var msg = new Paho.MQTT.Message(payload);
+  msg.destinationName = topic;
+  msg.qos = 1;
+  mqttClient.send(msg);
+}

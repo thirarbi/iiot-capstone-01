@@ -3,3 +3,51 @@
 2026-05-12 14:03:57,205 INFO []                 Book.java:2525 | Book stored as C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.omr
 2026-05-12 14:03:57,219 INFO []                 Book.java:1929 | Book reaching PAGE on sheets:[#1]
 2026-05-12 14:03:57,225 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LOAD
+2026-05-12 14:03:57,917 INFO [ibu-kita-kartini]            SheetStub.java:1278 | Loaded image #1 2479x3508 from C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\pdf\ibu-kita-kartini.pdf
+2026-05-12 14:03:57,926 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | BINARY
+2026-05-12 14:03:58,748 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | SCALE
+2026-05-12 14:03:58,771 INFO [ibu-kita-kartini]         ScaleBuilder.java:255  | Beam  guessed height: 13 -- mid of [6..20]
+2026-05-12 14:03:58,772 INFO [ibu-kita-kartini]         ScaleBuilder.java:271  | Beam measured height: 11 -- 0.36 of [6..20] range at 272% of needed quorum
+2026-05-12 14:03:58,772 INFO [ibu-kita-kartini]         ScaleBuilder.java:401  | Normalized black jitter: 4.76 %
+2026-05-12 14:03:58,772 INFO [ibu-kita-kartini]            ScaleStep.java:65   | Scale{ interline(20,21,21) line(2,2,3) beam(11)}
+2026-05-12 14:03:58,773 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | GRID
+2026-05-12 14:03:59,244 INFO [ibu-kita-kartini]       LinesRetriever.java:1500 | Global slope: 0.00000
+2026-05-12 14:03:59,278 INFO [ibu-kita-kartini]    ClustersRetriever.java:326  | Retrieved raw line clusters: 8 of sizes [5] with interline(20,21,21)
+2026-05-12 14:03:59,413 INFO [ibu-kita-kartini]            PeakGraph.java:310  | Systems: #1[1, 2] #2[3, 4] #3[5, 6] #4[7, 8]
+2026-05-12 14:03:59,711 INFO [ibu-kita-kartini]        SystemManager.java:779  | 1 part along 4 systems
+2026-05-12 14:03:59,712 INFO [ibu-kita-kartini]                 Book.java:543  | Created scores: [{Score 1}]
+2026-05-12 14:03:59,713 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | HEADERS
+2026-05-12 14:04:00,950 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | STEM_SEEDS
+2026-05-12 14:04:00,998 INFO [ibu-kita-kartini]        StemSeedsStep.java:86   | stem(3 max:3)
+2026-05-12 14:04:01,044 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | BEAMS
+2026-05-12 14:04:03,982 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LEDGERS
+2026-05-12 14:04:04,199 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | HEADS
+2026-05-12 14:04:08,458 INFO [ibu-kita-kartini]        HeadSeedTally.java:235  | Scale information: HeadSeeds{NOTEHEAD_BLACK[L:-0.5]}
+2026-05-12 14:04:08,459 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | STEMS
+2026-05-12 14:04:08,876 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | REDUCTION
+2026-05-12 14:04:09,006 INFO [ibu-kita-kartini]        ReductionStep.java:105  | Stems free length median value: 74 pixels, 3.5 interlines
+2026-05-12 14:04:09,009 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CUE_BEAMS
+2026-05-12 14:04:09,009 INFO [ibu-kita-kartini]         CueBeamsStep.java:81   | Step CUE_BEAMS is skipped because small heads switch is off
+2026-05-12 14:04:09,010 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | TEXTS
+2026-05-12 14:04:10,092 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | MEASURES
+2026-05-12 14:04:10,103 INFO [ibu-kita-kartini]                 Page.java:307  | 18 raw measures: [5 in system#1, 5 in system#2, 5 in system#3, 3 in system#4]
+2026-05-12 14:04:10,103 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CHORDS
+2026-05-12 14:04:10,125 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CURVES
+2026-05-12 14:04:10,828 INFO [ibu-kita-kartini]         SlursBuilder.java:240  | Slurs: 0
+2026-05-12 14:04:10,843 INFO [ibu-kita-kartini]      SegmentsBuilder.java:155  | Segments: 23
+2026-05-12 14:04:10,862 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | SYMBOLS
+2026-05-12 14:04:11,069 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LINKS
+2026-05-12 14:04:11,109 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | RHYTHMS
+2026-05-12 14:04:11,174 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | PAGE
+2026-05-12 14:04:11,188 INFO [ibu-kita-kartini]                 Book.java:2584 | Book{ibu-kita-kartini} storing
+2026-05-12 14:04:11,232 INFO [ibu-kita-kartini]                 Book.java:2565 | Stored /book.xml
+2026-05-12 14:04:11,349 INFO [ibu-kita-kartini]           DataHolder.java:348  | Stored /sheet#1/BINARY.png
+2026-05-12 14:04:11,882 INFO [ibu-kita-kartini]                Sheet.java:1583 | Stored /sheet#1/sheet#1.xml
+2026-05-12 14:04:11,882 INFO [ibu-kita-kartini]                 Book.java:2525 | Book stored as C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.omr
+2026-05-12 14:04:11,889 INFO [ibu-kita-kartini]            SheetStub.java:1655 | Sheet disposed
+2026-05-12 14:04:11,918 INFO [ibu-kita-kartini]                 Book.java:2050 | End of Stub#1
+2026-05-12 14:04:11,919 INFO [ibu-kita-kartini]                 Book.java:2057 | End of Book{ibu-kita-kartini}
+2026-05-12 14:04:12,275 INFO [ibu-kita-kartini]            SheetStub.java:1000 | Loaded /sheet#1/sheet#1.xml
+2026-05-12 14:04:12,794 INFO [ibu-kita-kartini]      PartwiseBuilder.java:2706 | Exporting sheet(s): [#1]
+2026-05-12 14:04:12,910 INFO [ibu-kita-kartini]        ScoreExporter.java:164  | Score ibu-kita-kartini exported to C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.mxl
+2026-05-12 14:04:12,947 INFO [ibu-kita-kartini]                Score.java:181  | Closing {Score 1}

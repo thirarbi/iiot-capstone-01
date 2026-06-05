@@ -4,8 +4,8 @@ const { SerialPort } = require('serialport');
 // 1. KONFIGURASI 3 NXT (Update COM Port Julian)
 const NXT_DEVICES = [
     { name: 'NXT-1', comPort: 'COM14' }, // DO, RE, MI
-    { name: 'NXT-3', comPort: 'COM13' }, // FA, SOL, LA
-    { name: 'NXT-4', comPort: 'COM16' }, // SI, DO_TINGGI
+    { name: 'NXT-3', comPort: 'COM11' }, // FA, SOL, LA
+    { name: 'NXT-4', comPort: 'COM12' }, // SI, DO_TINGGI
 ];
 
 // Pemetaan nada ke Robot dan Port Motor (0=A, 1=B, 2=C)
@@ -114,3 +114,127 @@ client.on('message', (topic, message) => {
         strikeNote(message.toString());
     }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. NXT TOUCH SENSOR INPUT — see docs/nxt-touch-input.md
+//
+// Touch sensors plug into NXT input ports (0–3 in protocol bytes,
+// 1–4 on the brick). The bridge polls each configured sensor and publishes
+// rising-edge press events to `robot/touch`.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Which input port on which NXT corresponds to which note.
+// `port` here is the protocol byte (0 = input 1, 1 = input 2, ...).
+const TOUCH_MAP = [
+    { nxt: 0, port: 0, note: 'DO' },
+    { nxt: 0, port: 1, note: 'RE' },
+    { nxt: 0, port: 2, note: 'MI' },
+    { nxt: 1, port: 0, note: 'FA' },
+    { nxt: 1, port: 1, note: 'SOL' },
+    { nxt: 1, port: 2, note: 'LA' },
+    { nxt: 2, port: 0, note: 'SI' },
+    { nxt: 2, port: 1, note: 'DO_TINGGI' },
+];
+
+const SENSOR_TYPE_SWITCH   = 0x01;
+const SENSOR_MODE_BOOLEAN  = 0x20;
+const POLL_INTERVAL_MS     = 150;   // per-sensor poll cadence
+
+// SetInputMode (cmd 0x05) — no reply needed.
+function makeSetInputModePacket(port, sensorType, sensorMode) {
+    return Buffer.from([0x05, 0x00, 0x80, 0x05, port, sensorType, sensorMode]);
+}
+
+// GetInputValues (cmd 0x07) — reply REQUIRED (cmdType 0x00).
+function makeGetInputValuesPacket(port) {
+    return Buffer.from([0x03, 0x00, 0x00, 0x07, port]);
+}
+
+// last-known boolean state per `${nxt}:${port}` so we emit only rising edges
+const lastTouchState = new Map();
+
+// Per-NXT incoming-byte buffer for frame reassembly
+const rxBuffers = serialPorts.map(() => Buffer.alloc(0));
+
+function handleSensorFrame(frame, nxtIdx) {
+    // GetInputValues reply payload (16 bytes after length prefix):
+    //   [0]=0x02 reply, [1]=0x07 cmd echo, [2]=status, [3]=port,
+    //   [4]=valid, [5]=calibrated, [6]=sensorType, [7]=sensorMode,
+    //   [8..9]=raw, [10..11]=normalized, [12..13]=scaled, [14..15]=calibrated
+    if (frame.length < 16)        return;
+    if (frame[0] !== 0x02)        return;  // not a reply telegram
+    if (frame[1] !== 0x07)        return;  // not GetInputValues
+    if (frame[2] !== 0x00)        return;  // non-zero status
+    if (frame[4] !== 0x01)        return;  // reading not valid
+
+    const port    = frame[3];
+    const scaled  = frame.readInt16LE(12);
+    const pressed = scaled !== 0;
+
+    const key       = `${nxtIdx}:${port}`;
+    const wasPressed = lastTouchState.get(key) || false;
+    lastTouchState.set(key, pressed);
+
+    if (!pressed || wasPressed) return;  // rising edge only
+
+    const mapping = TOUCH_MAP.find(t => t.nxt === nxtIdx && t.port === port);
+    if (!mapping) return;
+
+    const event = { note: mapping.note, nxt: nxtIdx, port, ts: Date.now() };
+    client.publish('robot/touch', JSON.stringify(event));
+    console.log(`👆 Touch: ${mapping.note} (NXT-${nxtIdx} port ${port})`);
+}
+
+function attachSensorReader(sp, nxtIdx) {
+    sp.on('data', (chunk) => {
+        rxBuffers[nxtIdx] = Buffer.concat([rxBuffers[nxtIdx], chunk]);
+        // Drain as many complete frames as possible
+        while (rxBuffers[nxtIdx].length >= 2) {
+            const payloadLen = rxBuffers[nxtIdx].readUInt16LE(0);
+            if (rxBuffers[nxtIdx].length < 2 + payloadLen) break;
+            const frame = rxBuffers[nxtIdx].subarray(2, 2 + payloadLen);
+            rxBuffers[nxtIdx] = rxBuffers[nxtIdx].subarray(2 + payloadLen);
+            handleSensorFrame(frame, nxtIdx);
+        }
+    });
+}
+
+function configureSensor(nxtIdx, port) {
+    const sp = serialPorts[nxtIdx];
+    if (!sp) return;
+    const send = () => safeWrite(
+        sp,
+        makeSetInputModePacket(port, SENSOR_TYPE_SWITCH, SENSOR_MODE_BOOLEAN),
+        `SetInputMode NXT-${nxtIdx} port ${port}`,
+    );
+    if (sp.isOpen) send();
+    else sp.once('open', send);
+}
+
+function startTouchPolling() {
+    // Attach one reader per NXT
+    serialPorts.forEach((sp, idx) => attachSensorReader(sp, idx));
+
+    // Tell each sensor what kind of sensor it is
+    TOUCH_MAP.forEach(({ nxt, port }) => configureSensor(nxt, port));
+
+    // Stagger initial polls across the cycle so we don't burst one NXT
+    TOUCH_MAP.forEach(({ nxt, port }, idx) => {
+        const stagger = Math.floor((POLL_INTERVAL_MS / TOUCH_MAP.length) * idx);
+        setTimeout(() => {
+            setInterval(() => {
+                const sp = serialPorts[nxt];
+                if (!sp || !sp.isOpen) return;
+                safeWrite(
+                    sp,
+                    makeGetInputValuesPacket(port),
+                    `GetInputValues NXT-${nxt} port ${port}`,
+                );
+            }, POLL_INTERVAL_MS);
+        }, stagger);
+    });
+
+    console.log(`👆 Touch polling active (${TOUCH_MAP.length} sensors @ ${POLL_INTERVAL_MS}ms)`);
+}
+
+startTouchPolling();
