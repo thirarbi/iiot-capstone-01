@@ -3,9 +3,9 @@ const { SerialPort } = require('serialport');
 
 // 1. KONFIGURASI 3 NXT (Update COM Port Julian)
 const NXT_DEVICES = [
-    { name: 'NXT-1', comPort: 'COM14' }, // DO, RE, MI
-    { name: 'NXT-3', comPort: 'COM11' }, // FA, SOL, LA
-    { name: 'NXT-4', comPort: 'COM12' }, // SI, DO_TINGGI
+    { name: 'NXT-1', comPort: 'COM15' }, // DO, RE, MI
+    { name: 'NXT-3', comPort: 'COM12' }, // FA, SOL, LA
+    { name: 'NXT-4', comPort: 'COM25' }, // SI, DO_TINGGI
 ];
 
 // Pemetaan nada ke Robot dan Port Motor (0=A, 1=B, 2=C)
@@ -15,9 +15,9 @@ const NOTE_MAP = {
     'SI': { nxt: 2, port: 0 }, 'DO_TINGGI': { nxt: 2, port: 1 }
 };
 
-const PRESS_POWER = 80;    // Kekuatan pukul
-const HOLD_MS = 200;       // Durasi tuts ditekan (ms)
-const PRESS_DEGREES = 45;  // Batas rotasi per pukulan (derajat) — cegah over-rotate
+const PRESS_POWER = 75;    // Kekuatan pukul
+const HOLD_MS = 200;       // Durasi tuts ditekan (ms) -> Dinaikkan untuk memberi waktu ayunan 90 derajat
+const PRESS_DEGREES = 30;  // Batas rotasi per pukulan (derajat) -> Diubah jadi 90 derajat
 
 // 2. FUNGSI PEMBUAT PAKET (NXT Direct Command)
 function makeRunPacket(port, power, degrees = PRESS_DEGREES) {
@@ -181,8 +181,15 @@ function handleSensorFrame(frame, nxtIdx) {
     if (!mapping) return;
 
     const event = { note: mapping.note, nxt: nxtIdx, port, ts: Date.now() };
+    
+    // Tetap kirim data ke MQTT supaya Web UI menyala saat tombol fisik ditekan
     client.publish('robot/touch', JSON.stringify(event));
+    
+    // Tetap munculkan tulisan log di Terminal
     console.log(`👆 Touch: ${mapping.note} (NXT-${nxtIdx} port ${port})`);
+    
+    // Motor TIDAK lagi aktuasi otomatis dari tombol fisik (dimatikan)
+    // strikeNote(mapping.note);
 }
 
 function attachSensorReader(sp, nxtIdx) {
