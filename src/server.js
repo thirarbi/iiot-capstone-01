@@ -32,6 +32,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // FILE PATH CORRECTION ======================================================
   // Resolve to a filesystem path — use the raw urlPath for the root check
   // (path.normalize converts '/' to '\' on Windows, breaking the === '/' test)
   const resolved = urlPath === '/' ? 'index.html' : urlPath.replace(/^\//, '');

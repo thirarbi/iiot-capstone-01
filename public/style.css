@@ -1,4 +1,5 @@
 /* Per-theme fonts */
+/* FULL AI, DON'T JUDGE ME! */
 body[data-theme="neon"]     { font-family: 'Orbitron', 'Segoe UI', sans-serif; }
 body[data-theme="classic"]  { font-family: 'Playfair Display', Georgia, serif; }
 body[data-theme="midnight"] { font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }

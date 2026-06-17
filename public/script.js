@@ -4,6 +4,7 @@
 // Override by setting window.MQTT_HOST before this script loads.
 // ============================================================
 // Use saved broker from settings, falling back to page hostname
+
 var hostname = window.MQTT_HOST ||
                (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_broker')) ||
                window.location.hostname ||
@@ -70,6 +71,7 @@ function onConnectionLost(resp) {
 //  robot/strike — the bridge confirmed the motor actually fired
 //                 → triggers key highlight + Now Playing
 // ============================================================
+
 function onMessageArrived(message) {
   var payload = message.payloadString;
   if (message.destinationName === topicStrike) {

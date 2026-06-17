@@ -15,9 +15,9 @@ const NOTE_MAP = {
     'SI': { nxt: 2, port: 0 }, 'DO_TINGGI': { nxt: 2, port: 1 }
 };
 
-const PRESS_POWER = 75;    // Kekuatan pukul
-const HOLD_MS = 200;       // Durasi tuts ditekan (ms) -> Dinaikkan untuk memberi waktu ayunan 90 derajat
-const PRESS_DEGREES = 30;  // Batas rotasi per pukulan (derajat) -> Diubah jadi 90 derajat
+const PRESS_POWER = 75;    // How fast the motor turns
+const HOLD_MS = 200;       // ms, delay for the motor turn go and back
+const PRESS_DEGREES = 30;  // Limit of motor turn
 
 // 2. FUNGSI PEMBUAT PAKET (NXT Direct Command)
 function makeRunPacket(port, power, degrees = PRESS_DEGREES) {
@@ -195,6 +195,7 @@ function handleSensorFrame(frame, nxtIdx) {
 function attachSensorReader(sp, nxtIdx) {
     sp.on('data', (chunk) => {
         rxBuffers[nxtIdx] = Buffer.concat([rxBuffers[nxtIdx], chunk]);
+        
         // Drain as many complete frames as possible
         while (rxBuffers[nxtIdx].length >= 2) {
             const payloadLen = rxBuffers[nxtIdx].readUInt16LE(0);
