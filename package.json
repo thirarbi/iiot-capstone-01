@@ -1,11 +1,12 @@
 {
   "name": "iiot-capstone-01",
   "version": "1.0.0",
-  "description": "IIoT Capstone - NXT Xylophone Player with Piano Tiles UI and Note Reader",
+  "description": "IIoT Capstone - NXT Piano Player with Tiles UI and Note Reader",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
+    "all": "node scripts/start-all.js",
     "broker": "node src/broker.js",
     "bridge": "node src/nxt_bridge.js",
     "note-reader": "python note-reader/main.py"

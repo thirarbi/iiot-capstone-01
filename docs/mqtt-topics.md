@@ -6,9 +6,17 @@ Single source of truth for topic names, payloads, and direction. Update this fil
 
 | Topic           | Direction              | QoS | Payload                                 | Purpose                                                                 |
 |-----------------|------------------------|-----|-----------------------------------------|-------------------------------------------------------------------------|
-| `robot/nada`    | UI → bridge            | 0   | plain string e.g. `"DO"`                | Manual key press from the Piano Tiles UI; bridge fires that motor.      |
+| `robot/nada`    | UI / Python → bridge   | 0   | plain string e.g. `"DO"`                | One discrete strike. Manual key tap from the UI, **and** each note in `main.py`'s `stream` delivery mode. |
+| `score/mode`    | UI → Python            | 1 (retained) | plain string `"compiled"` or `"stream"` | Web UI picks how `main.py` delivers a song. Retained so the note-reader reads the current choice at startup. See [score-delivery-modes.md](score-delivery-modes.md). |
+| `score/play`    | UI → Python            | 1   | `{}` or `{ "mode": "stream" }`          | Web UI Play button. Tells the note-reader **service** to play the cached score (optionally overriding the mode). |
+| `score/convert` | UI → Python            | 1   | empty                                   | Web UI "Re-convert" button. Re-runs Audiveris on the latest PDF and re-caches the compiled score. |
+| `score/stop`    | UI → Python            | 1   | empty                                   | Web UI Stop button. Halts the current playback (also makes the service publish `robot/stop`). |
+| `score/status`  | Python → UI            | 1 (retained) | `{ "state": "ready", "title": "...", "notes": 42, "mode": "stream", "ts": ... }` | Note-reader service state (`idle`/`converting`/`ready`/`playing`). Retained so a fresh tab sees it. |
+| `robot/stop`    | Python → bridge        | 0   | empty                                   | Cancel any scheduled (compiled) song and brake every motor. |
+| `robot/hold`    | UI → bridge            | 0   | `{ "note": "DO", "action": "press" }` / `"release"` | Manual press-and-hold. `press` parks the motor at the press position; `release` retracts it. Used by the Piano Tiles keys so a held key stays put. Motor power/timing per [motor-tuning.md](motor-tuning.md). |
 | `robot/score`   | Python → bridge, UI    | 1   | JSON `ScorePacket`                      | Compiled full-song push from `note-reader/main.py`. See [compiled-score-single-push.md](compiled-score-single-push.md). |
-| `robot/strike`  | bridge → UI            | 0   | plain string e.g. `"DO"`                | Motor-fired confirmation. UI uses this for key highlight + Now Playing. |
+| `robot/strike`  | bridge → UI            | 0   | plain string e.g. `"DO"`                | **Real** strike confirmation — published when the NXT acknowledges the press command (reply-required Direct Command), not optimistically. Drives key highlight, Now Playing, and the motor heatmap. See [nxt-strike-confirmation.md](nxt-strike-confirmation.md). |
+| `robot/latency` | bridge → UI            | 0   | `{ "note": "DO", "nxt": 0, "port": 0, "ms": 87, "confirmed": true }` | Bridge-measured command→ack round-trip for each strike. Feeds the Command→Strike Latency panel; populates in **both** delivery modes. `confirmed:false` means the ack timed out (lost reply / no brick). |
 
 ## New topics (touch input + session logging)
 
@@ -18,6 +26,12 @@ Single source of truth for topic names, payloads, and direction. Update this fil
 | `session/begin`   | UI → logger     | 1   | `{ "session_id": "20260605-141233" }`                                            | Open a new JSONL log file.                                               |
 | `session/end`     | UI → logger     | 1   | `{ "session_id": "20260605-141233" }`                                            | Close the active log file.                                               |
 | `session/status`  | logger → UI     | 1 (retained) | `{ "active": true, "session_id": "20260605-141233", "started_ts": 1716...}` | Logger's authoritative state. Retained so a fresh tab sees current state on subscribe. |
+
+## Conversion progress
+
+| Topic            | Direction       | QoS | Payload                                                                 | Purpose                                                                  |
+|------------------|-----------------|-----|-------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| `convert/status` | Python → UI     | 0   | `{ "stage": "omr", "state": "active", "detail": "ibu-kita-kartini.pdf", "ts": 1716... }` | Live pipeline progress from `note-reader/main.py`. Lights the matching node (`src`/`omr`/`pub`) in the Web UI's data-flow diagram while that step runs; `state: "done"` clears it. Best-effort (QoS 0) — never blocks the conversion. |
 
 ## Monitor topics (health dashboard)
 

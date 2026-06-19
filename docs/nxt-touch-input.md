@@ -8,7 +8,17 @@ A LEGO touch sensor mounted next to (or under) each xylophone bar lets a human p
 
 1. Have the press **logged** locally in this project (see [session-logging.md](session-logging.md)).
 2. Have the **web UI** highlight that key in real time (re-uses the existing key-highlight CSS).
-3. **Not** fire the motor on that bar — the human is already striking it manually.
+3. **Fire the motor** on that bar — the physical button now drives the matching
+   motor with the same discrete strike (press → settle → retract) the Web UI keys
+   use, through the shared `strikeNote()` / press-settle logic in
+   [src/nxt_bridge.js](../src/nxt_bridge.js). Motor power/travel/timing come from
+   [config/motors.json](../config/motors.json) (see [motor-tuning.md](motor-tuning.md)).
+
+> **Note:** this reverses the original design intent, where a touch *observed*
+> manual play without actuating. The button is now an input that plays the
+> instrument. The rising-edge press still also publishes `robot/touch` for the
+> UI highlight and session log, so the logging/visualisation behaviour is
+> unchanged — the strike is additive.
 
 ## Hardware mapping
 

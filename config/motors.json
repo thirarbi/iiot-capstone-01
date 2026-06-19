@@ -1,0 +1,25 @@
+{
+  "_comment": "Per-motor tuning for the NXT xylophone. Edit a value, SAVE, and the bridge hot-reloads it live (no restart) — then press a key in the Web UI to test. Each motor inherits everything from `defaults`; under `motors` add ONLY the keys you want to override for that one note. See docs/motor-tuning.md. These same settings govern BOTH manual key presses and full songs played from note-reader/main.py. pressDegrees = max PRESS rotation, returnDegrees = max RETURN rotation (defaults to pressDegrees), pressSettleMs = the press is locked in for this long so a slow press still reaches its rotation before it can roll back.",
+
+  "defaults": {
+    "power": 75,
+    "direction": 1,
+    "pressDegrees": 30,
+    "returnDegrees": 30,
+    "pressSettleMs": 250,
+    "holdMs": 200,
+    "reversePower": 75,
+    "maxHoldMs": 5000
+  },
+
+  "motors": {
+    "DO": {"direction": -1},
+    "RE": {"pressDegrees": 15, "returnDegrees": 15},
+    "MI": {"direction": -1, "power": 90},
+    "FA": {"pressDegrees": -45, "returnDegrees": -45},
+    "SOL": {"pressDegrees": 45, "returnDegrees": 45},
+    "LA": {"pressDegrees": 45, "returnDegrees": 45},
+    "SI": {"direction": -1},
+    "DO_TINGGI": {"direction": -1}
+  }
+}

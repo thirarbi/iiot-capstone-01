@@ -46,11 +46,20 @@ function onConnected() {
   mqttClient.subscribe(topicStrike);
   mqttClient.subscribe('robot/score');
   mqttClient.subscribe('robot/touch');
+  mqttClient.subscribe('robot/hold');      // manual press-and-hold (flow + latency)
+  mqttClient.subscribe('robot/latency');   // bridge-measured NXT strike-confirm latency
+  mqttClient.subscribe('convert/status');  // live PDF→OMR→main.py conversion progress
+  mqttClient.subscribe('score/mode');      // retained delivery-mode selection
+  mqttClient.subscribe('score/status');    // note-reader service state (idle/ready/playing)
+
   mqttClient.subscribe('session/status');
   mqttClient.subscribe('health/bridge');   // Industrial Monitor — health dashboard
   mqttClient.subscribe('health/server');
   setStatus(true);
   log('Connected to broker at ' + hostname + ':' + port, 'system');
+  // Seed the retained mode so main.py reads the same value the UI shows,
+  // even if the broker restarted and lost its retained state.
+  publishScoreModeRetained(scoreMode);
 }
 
 function onConnectionFailed(err) {
@@ -98,14 +107,67 @@ function onMessageArrived(message) {
       var score = JSON.parse(payload);
       log('Score diterima: "' + score.title + '" \u2014 ' + score.notes.length + ' nada', 'system');
     } catch (e) {}
+  } else if (message.destinationName === 'robot/hold') {
+    // Already logged locally on press; Monitor.handleMessage drove the flow/latency.
+  } else if (message.destinationName === 'robot/latency') {
+    // Monitor.handleMessage recorded the sample; nothing to log per-note.
+  } else if (message.destinationName === 'score/mode') {
+    renderScoreMode(payload.replace(/"/g, '').trim());
+  } else if (message.destinationName === 'score/status') {
+    try { renderPlaybackStatus(JSON.parse(payload)); } catch (e) {}
+  } else if (message.destinationName === 'convert/status') {
+    try {
+      var prog = JSON.parse(payload);
+      if (prog.state === 'active') {
+        var STAGE_LABELS = { src: 'PDF / Score', omr: 'Audiveris OMR', pub: 'main.py' };
+        log('Converting: ' + (STAGE_LABELS[prog.stage] || prog.stage)
+            + (prog.detail ? ' \u2014 ' + prog.detail : ''), 'system');
+      }
+    } catch (e) {}
   } else {
     log('Command: ' + payload, 'system');
   }
 }
 
 // ============================================================
-// Send a note (called by the piano-key buttons)
+// Manual input — press / hold / release
+//   A key press holds the motor down for as long as the key (mouse or
+//   keyboard) is held, and only retracts on release. The bridge receives
+//   { note, action } on robot/hold and never re-strikes while held, so a
+//   held key stays put instead of oscillating in and out.
+//   sendNote() (robot/nada discrete click) is kept for compatibility.
 // ============================================================
+var manualHeld = {};  // note -> true while pressed
+
+function publishHold(note, action) {
+  if (!mqttClient.isConnected()) {
+    log('Not connected to broker', 'system');
+    return false;
+  }
+  var msg = new Paho.MQTT.Message(JSON.stringify({ note: note, action: action }));
+  msg.destinationName = 'robot/hold';
+  mqttClient.send(msg);
+  return true;
+}
+
+function beginPress(note) {
+  if (manualHeld[note]) return;            // already down — ignore key auto-repeat
+  if (!publishHold(note, 'press')) return;
+  manualHeld[note] = true;
+  var keyEl = document.querySelector('.key[data-note="' + note + '"]');
+  if (keyEl) keyEl.classList.add('active');
+  log('Press: ' + note, 'sent');
+}
+
+function endPress(note) {
+  if (!manualHeld[note]) return;
+  manualHeld[note] = false;
+  publishHold(note, 'release');
+  var keyEl = document.querySelector('.key[data-note="' + note + '"]');
+  if (keyEl) keyEl.classList.remove('active');
+}
+
+// Discrete single click (robot/nada) — retained for compatibility / external use
 function sendNote(note) {
   if (!mqttClient.isConnected()) {
     log('Not connected to broker', 'system');
@@ -117,6 +179,17 @@ function sendNote(note) {
   log('Sent: ' + note, 'sent');
 }
 
+// Wire the on-screen piano keys to press/release (mouse + touch)
+document.querySelectorAll('.key').forEach(function (btn) {
+  var note = btn.getAttribute('data-note');
+  btn.addEventListener('mousedown',  function (e) { e.preventDefault(); beginPress(note); });
+  btn.addEventListener('mouseup',    function ()  { endPress(note); });
+  btn.addEventListener('mouseleave', function ()  { endPress(note); });
+  btn.addEventListener('touchstart', function (e) { e.preventDefault(); beginPress(note); }, { passive: false });
+  btn.addEventListener('touchend',   function (e) { e.preventDefault(); endPress(note); });
+  btn.addEventListener('touchcancel',function ()  { endPress(note); });
+});
+
 // ============================================================
 // UI Helpers
 // ============================================================
@@ -124,12 +197,11 @@ function highlightKey(note) {
   var keyEl = document.querySelector('.key[data-note="' + note + '"]');
   if (!keyEl) return;
   keyEl.classList.add('active');
-  // Don't auto-remove if the physical keyboard key is currently held down
-  var isHeld = Object.keys(heldKeys).some(function (k) {
-    return heldKeys[k] && heldKeys[k].el === keyEl;
-  });
-  if (!isHeld) {
-    setTimeout(function () { keyEl.classList.remove('active'); }, 350);
+  // Don't auto-remove while the key is being held down (manual press-and-hold)
+  if (!manualHeld[note]) {
+    setTimeout(function () {
+      if (!manualHeld[note]) keyEl.classList.remove('active');
+    }, 350);
   }
 }
 
@@ -170,47 +242,27 @@ var KEY_MAP = {
   'k': 'DO_TINGGI'
 };
 
-// heldKeys stores { el, interval } per active key
-var heldKeys = {};
-
-var HOLD_REPEAT_DELAY  = 500; // ms before repeat starts
-var HOLD_REPEAT_RATE   = 300; // ms between repeated notes while held
-
 document.addEventListener('keydown', function (e) {
   // Ignore when typing in an input / textarea
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  var key = e.key.toLowerCase();
-  var note = KEY_MAP[key];
-  if (!note || heldKeys[key]) return; // already handled
-
-  var keyEl = document.querySelector('.key[data-note="' + note + '"]');
-
-  // Visually activate immediately
-  if (keyEl) keyEl.classList.add('active');
-
-  // Send first note right away
-  sendNote(note);
-
-  // After initial delay, start repeating while held
-  var timeout = setTimeout(function () {
-    var interval = setInterval(function () {
-      sendNote(note);
-    }, HOLD_REPEAT_RATE);
-    if (heldKeys[key]) heldKeys[key].interval = interval;
-  }, HOLD_REPEAT_DELAY);
-
-  heldKeys[key] = { el: keyEl, timeout: timeout, interval: null };
+  if (e.repeat) return;  // ignore OS auto-repeat — the motor is already held
+  var note = KEY_MAP[e.key.toLowerCase()];
+  if (!note) return;
+  beginPress(note);
 });
 
 document.addEventListener('keyup', function (e) {
-  var key = e.key.toLowerCase();
-  var held = heldKeys[key];
-  if (!held) return;
+  var note = KEY_MAP[e.key.toLowerCase()];
+  if (!note) return;
+  endPress(note);
+});
 
-  clearTimeout(held.timeout);
-  if (held.interval) clearInterval(held.interval);
-  if (held.el) held.el.classList.remove('active');
-  delete heldKeys[key];
+// If focus is lost while a key is held (alt-tab, etc.), release everything so
+// no motor is left pressed.
+window.addEventListener('blur', function () {
+  Object.keys(manualHeld).forEach(function (note) {
+    if (manualHeld[note]) endPress(note);
+  });
 });
 
 // ============================================================
@@ -264,6 +316,121 @@ function applyTheme(theme) {
     reconnectToBroker(newHost);
     panel.classList.remove('open');
   });
+})();
+
+// ============================================================
+// Score delivery mode — see docs/score-delivery-modes.md
+//   Picks how note-reader/main.py sends a song:
+//     stream   — one note per read, in real time (per-note latency is visible)
+//     compiled — send the whole score once, the NXT bridge plays it locally
+//   Published retained on score/mode so main.py reads the current choice at
+//   startup and any other tab stays in sync.
+// ============================================================
+var scoreMode = (typeof localStorage !== 'undefined' && localStorage.getItem('nxt_score_mode')) || 'compiled';
+
+var MODE_HINTS = {
+  stream:   'main.py streams each note live → watch the latency panel.',
+  compiled: 'main.py sends the whole score once → near-zero per-note latency.'
+};
+
+function renderScoreMode(mode) {
+  if (mode !== 'stream' && mode !== 'compiled') return;
+  scoreMode = mode;
+  if (typeof localStorage !== 'undefined') localStorage.setItem('nxt_score_mode', mode);
+  document.querySelectorAll('.mode-btn').forEach(function (b) {
+    b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+  });
+  var hint = document.getElementById('mode-hint');
+  if (hint) hint.textContent = MODE_HINTS[mode] || '';
+}
+
+function publishScoreModeRetained(mode) {
+  if (mode !== 'stream' && mode !== 'compiled') return false;
+  if (!mqttClient.isConnected()) return false;
+  var msg = new Paho.MQTT.Message(mode);
+  msg.destinationName = 'score/mode';
+  msg.qos = 1;
+  msg.retained = true;   // so main.py sees it whenever it next runs
+  mqttClient.send(msg);
+  return true;
+}
+
+function setScoreMode(mode) {
+  if (mode !== 'stream' && mode !== 'compiled') return;
+  renderScoreMode(mode);
+  if (publishScoreModeRetained(mode)) {
+    log('Score send mode → ' + mode, 'system');
+  } else {
+    log('Not connected — mode saved, will publish on connect', 'system');
+  }
+}
+
+document.querySelectorAll('.mode-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () { setScoreMode(btn.getAttribute('data-mode')); });
+});
+renderScoreMode(scoreMode);  // reflect saved choice until the retained value arrives
+
+// ============================================================
+// Playback control — drives the note-reader service
+//   Convert once, then Play / Stop on demand (no Audiveris re-run between
+//   plays). State comes back on retained score/status. See
+//   docs/score-delivery-modes.md.
+// ============================================================
+var PB_LABELS = {
+  idle:       'No score loaded',
+  converting: 'Converting…',
+  ready:      'Ready',
+  playing:    'Playing…'
+};
+
+function renderPlaybackStatus(s) {
+  s = s || {};
+  var statusEl = document.getElementById('pb-status');
+  var playBtn  = document.getElementById('btn-play');
+  var convBtn  = document.getElementById('btn-convert');
+  var stopBtn  = document.getElementById('btn-stop');
+  if (!statusEl) return;
+
+  var state = s.state || 'idle';
+  var text  = PB_LABELS[state] || state;
+  if (s.title)  text += ' · ' + s.title + (s.notes ? ' (' + s.notes + ' notes)' : '');
+  if (s.error)  text += ' · ⚠ ' + s.error;
+  statusEl.textContent = text;
+
+  var converting = state === 'converting';
+  var playing    = state === 'playing';
+  if (convBtn) convBtn.disabled = converting || playing;
+  if (playBtn) playBtn.disabled = converting || playing || !s.notes;
+  if (stopBtn) stopBtn.disabled = !playing;
+}
+
+function publishCmd(topic, payload) {
+  if (!mqttClient.isConnected()) { log('Not connected to broker', 'system'); return; }
+  var msg = new Paho.MQTT.Message(payload || '');
+  msg.destinationName = topic;
+  msg.qos = 1;
+  mqttClient.send(msg);
+}
+
+(function initPlayback() {
+  var convBtn = document.getElementById('btn-convert');
+  var playBtn = document.getElementById('btn-play');
+  var stopBtn = document.getElementById('btn-stop');
+  if (convBtn) convBtn.addEventListener('click', function () {
+    publishCmd('score/convert', ''); log('Re-convert requested', 'sent');
+  });
+  if (playBtn) playBtn.addEventListener('click', function () {
+    publishCmd('score/play', JSON.stringify({ mode: scoreMode }));
+    log('Play (' + scoreMode + ')', 'sent');
+  });
+  if (stopBtn) stopBtn.addEventListener('click', function () {
+    publishCmd('score/stop', ''); log('Stop requested', 'sent');
+  });
+  // Until the service publishes its retained status, assume it's offline and
+  // disable the controls. They light up the moment a score/status arrives.
+  if (convBtn) convBtn.disabled = true;
+  if (playBtn) playBtn.disabled = true;
+  if (stopBtn) stopBtn.disabled = true;
 })();
 
 // ============================================================
@@ -321,7 +488,7 @@ function toggleSession() {
 // Industrial Monitor — see docs/visualizations.md
 // Four live views, all driven by the MQTT bus (no extra deps):
 //   1. Live data-flow diagram  (robot/score · robot/nada · robot/strike · robot/touch)
-//   3. Latency histogram        (robot/nada → robot/strike round-trip)
+//   3. Latency histogram        (robot/latency — NXT command→ack round-trip)
 //   4. Per-NXT motor heatmap     (robot/strike, mapped via NOTE_MAP)
 //   7. Health dashboard          (health/bridge · health/server · connection state)
 // ============================================================
@@ -406,6 +573,25 @@ var Monitor = (function () {
       setTimeout(function () { a.classList.remove('flow-on'); }, FLOW_LINGER);
     }, delay);
   }
+  // ---- Conversion progress (convert/status) ----------------------------
+  // A persistent "processing" glow on whichever pipeline stage main.py says
+  // is running right now (src → omr → pub), distinct from the transient
+  // packet pulse above. Only one stage glows at a time.
+  var processNode = null;
+  function clearProcess() {
+    if (processNode && nodeEls[processNode]) {
+      nodeEls[processNode].classList.remove('flow-processing');
+    }
+    processNode = null;
+  }
+  function processFlow(stage, state) {
+    clearProcess();
+    if (state === 'active' && nodeEls[stage]) {
+      nodeEls[stage].classList.add('flow-processing');
+      processNode = stage;
+    }
+  }
+
   function pulseFlow(kind) {
     var path = FLOW_PATHS[kind];
     if (!path) return;
@@ -423,7 +609,7 @@ var Monitor = (function () {
   // ---- 3. Latency histogram --------------------------------------------
   var LAT_BOUNDS = [50, 100, 150, 200, 300, 500];
   var LAT_LABELS = ['<50', '50-100', '100-150', '150-200', '200-300', '300-500', '>500'];
-  var lat = { pending: {}, counts: [], last: null, min: null, max: null, sum: 0, n: 0 };
+  var lat = { counts: [], last: null, min: null, max: null, sum: 0, n: 0 };
   var latBarEls = [], latStatEls = {};
 
   function buildLatency(container) {
@@ -457,20 +643,17 @@ var Monitor = (function () {
     for (var i = 0; i < LAT_BOUNDS.length; i++) if (ms < LAT_BOUNDS[i]) return i;
     return LAT_BOUNDS.length;
   }
-  function latCommand(note) {
-    var q = lat.pending[note] || (lat.pending[note] = []);
-    q.push(Date.now());
-    if (q.length > 32) q.shift();  // drop stale unmatched commands (e.g. score-only runs)
-  }
-  function latStrike(note) {
-    var q = lat.pending[note];
-    if (!q || !q.length) return;   // a strike with no matching command (scheduled score) → no sample
-    var dt = Date.now() - q.shift();
-    lat.counts[latBucket(dt)]++;
-    lat.last = dt;
-    lat.min  = lat.min == null ? dt : Math.min(lat.min, dt);
-    lat.max  = lat.max == null ? dt : Math.max(lat.max, dt);
-    lat.sum += dt; lat.n++;
+  // Record a bridge-measured command→ack latency (robot/latency). Measured at
+  // the bridge as time from sending the press to the NXT confirming receipt, so
+  // it works the same in both delivery modes (compiled has no per-note MQTT
+  // command to pair against on this side).
+  function recordLatency(ms) {
+    if (typeof ms !== 'number' || isNaN(ms) || ms < 0) return;
+    lat.counts[latBucket(ms)]++;
+    lat.last = ms;
+    lat.min  = lat.min == null ? ms : Math.min(lat.min, ms);
+    lat.max  = lat.max == null ? ms : Math.max(lat.max, ms);
+    lat.sum += ms; lat.n++;
     renderLatency();
   }
   function renderLatency() {
@@ -622,15 +805,28 @@ var Monitor = (function () {
         break;
       case 'robot/nada':
         pulseFlow('nada');
-        latCommand(payload);
+        break;
+      case 'robot/hold':
+        try {
+          var h = JSON.parse(payload);
+          if (h.action === 'press') pulseFlow('nada');
+        } catch (e) {}
         break;
       case 'robot/strike':
         pulseFlow('strike');
-        latStrike(payload);
         heatStrike(payload);
+        break;
+      case 'robot/latency':
+        try { recordLatency(JSON.parse(payload).ms); } catch (e) {}
         break;
       case 'robot/touch':
         pulseFlow('touch');
+        break;
+      case 'convert/status':
+        try {
+          var p = JSON.parse(payload);
+          processFlow(p.stage, p.state);
+        } catch (e) {}
         break;
       case 'health/bridge':
         try {

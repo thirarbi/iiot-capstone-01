@@ -111,39 +111,43 @@ By default, all components connect to `localhost`. To use a remote broker:
 
 ## Usage
 
-### Start the server (broker + web UI)
+### Start everything (recommended)
 
 ```bash
-npm start
+npm run all
 ```
 
-This starts:
-- MQTT broker on port **1883** (TCP) and **8883** (WebSocket)
-- Web UI at **http://localhost:8080**
+One command launches the whole stack — broker, web server, NXT bridge, and the
+note-reader service — with labelled, colour-coded output. Press **Ctrl+C** to
+stop them all. (Each piece can still be run on its own in a separate terminal;
+see below.)
 
-### Start the NXT bridge (in a separate terminal)
+This brings up:
+- MQTT broker on port **1883** (TCP) and **8883** (WebSocket) — `npm run broker`
+- Web UI + session logger at **http://localhost:8080** — `npm start`
+- NXT bridge (motors + touch sensors) — `npm run bridge`
+- Note-reader service — `npm run note-reader`
 
-```bash
-npm run bridge
-```
+### The Note Reader (now a service)
 
-### Run the Note Reader (in a separate terminal)
+Place a PDF score in `scores/pdf/`. The note-reader starts as a **service**: on
+launch it runs Audiveris on the latest PDF, compiles the notes, and then waits
+for commands from the Web UI. You control playback from the page:
 
-Place a PDF score in `scores/pdf/`, then:
-
-```bash
-npm run note-reader
-```
-
-This will:
-1. Find the latest PDF in `scores/pdf/`
-2. Run Audiveris to produce a `.mxl` file in `scores/mxl/`
-3. Parse the notes and publish them via MQTT to `robot/nada`
-4. The Piano Tiles UI will show each note lighting up in real time
+- **▶ Play** — play the compiled score
+- **■ Stop** — halt playback immediately
+- **↻ Re-convert PDF** — re-run Audiveris (only needed when you change the PDF)
+- **Score send mode** — choose **Streaming** (one note at a time, real time) or
+  **Compiled** (send the whole song once, the bridge plays it locally) and
+  compare their response time in the Industrial Monitor's latency panel. See
+  [docs/score-delivery-modes.md](docs/score-delivery-modes.md).
 
 ### Manual play
 
-Open **http://localhost:8080** and click the piano keys to send individual notes to the NXT robots.
+Open **http://localhost:8080** and press the piano keys (mouse or A–K on the
+keyboard) to drive individual motors. Holding a key holds the note; motor
+behaviour is tunable per-motor in [config/motors.json](config/motors.json) —
+see [docs/motor-tuning.md](docs/motor-tuning.md).
 
 ## How It Works
 

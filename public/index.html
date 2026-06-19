@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NXT Xylophone - Piano Tiles</title>
+  <title>NXT IoT Piano Player</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Playfair+Display:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
 <body data-theme="neon">
 
-  <h1>NXT Xylophone</h1>
+  <h1>NXT Piano</h1>
   <p class="subtitle">Piano Tiles Controller &amp; Note Reader Monitor</p>
   <div id="status" class="status disconnected">Disconnected</div>
 
@@ -26,6 +26,24 @@
     <span id="session-info"></span>
   </div>
 
+  <!-- Score delivery mode — main.py reads this (retained score/mode). See docs/score-delivery-modes.md -->
+  <div class="mode-controls">
+    <span class="mode-label">Score send mode</span>
+    <div class="mode-toggle" role="group" aria-label="Score send mode">
+      <button type="button" class="mode-btn" data-mode="stream">Streaming<small>per note, real time</small></button>
+      <button type="button" class="mode-btn" data-mode="compiled">Compiled<small>send all, NXT plays</small></button>
+    </div>
+    <span class="mode-hint" id="mode-hint"></span>
+  </div>
+
+  <!-- Playback control — drives the note-reader service (score/convert · score/play · score/stop) -->
+  <div class="playback-controls">
+    <button type="button" id="btn-convert" class="pb-btn">↻ Re-convert PDF</button>
+    <button type="button" id="btn-play" class="pb-btn pb-primary">▶ Play</button>
+    <button type="button" id="btn-stop" class="pb-btn">■ Stop</button>
+    <span class="pb-status" id="pb-status">Note-reader offline</span>
+  </div>
+
   <div class="now-playing">
     <div class="label">NOW PLAYING</div>
     <div class="note" id="nowPlaying">—</div>
@@ -33,15 +51,16 @@
 
   <p class="section-title">Tap a key or let the Note Reader play</p>
   
+  <!-- Keys use press/hold/release (see script.js) — held key stays pressed -->
   <div class="piano">
-    <button class="key" data-note="DO" onclick="sendNote('DO')"><span class="kbd">A</span>DO</button>
-    <button class="key" data-note="RE" onclick="sendNote('RE')"><span class="kbd">S</span>RE</button>
-    <button class="key" data-note="MI" onclick="sendNote('MI')"><span class="kbd">D</span>MI</button>
-    <button class="key" data-note="FA" onclick="sendNote('FA')"><span class="kbd">F</span>FA</button>
-    <button class="key" data-note="SOL" onclick="sendNote('SOL')"><span class="kbd">G</span>SOL</button>
-    <button class="key" data-note="LA" onclick="sendNote('LA')"><span class="kbd">H</span>LA</button>
-    <button class="key" data-note="SI" onclick="sendNote('SI')"><span class="kbd">J</span>SI</button>
-    <button class="key" data-note="DO_TINGGI" onclick="sendNote('DO_TINGGI')"><span class="kbd">K</span>DO'</button>
+    <button class="key" data-note="DO"><span class="kbd">A</span>DO</button>
+    <button class="key" data-note="RE"><span class="kbd">S</span>RE</button>
+    <button class="key" data-note="MI"><span class="kbd">D</span>MI</button>
+    <button class="key" data-note="FA"><span class="kbd">F</span>FA</button>
+    <button class="key" data-note="SOL"><span class="kbd">G</span>SOL</button>
+    <button class="key" data-note="LA"><span class="kbd">H</span>LA</button>
+    <button class="key" data-note="SI"><span class="kbd">J</span>SI</button>
+    <button class="key" data-note="DO_TINGGI"><span class="kbd">K</span>DO'</button>
   </div>
 
   <div class="log-container">
