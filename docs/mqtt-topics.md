@@ -19,6 +19,13 @@ Single source of truth for topic names, payloads, and direction. Update this fil
 | `session/end`     | UI → logger     | 1   | `{ "session_id": "20260605-141233" }`                                            | Close the active log file.                                               |
 | `session/status`  | logger → UI     | 1 (retained) | `{ "active": true, "session_id": "20260605-141233", "started_ts": 1716...}` | Logger's authoritative state. Retained so a fresh tab sees current state on subscribe. |
 
+## Monitor topics (health dashboard)
+
+| Topic            | Direction       | QoS | Payload                                                                 | Purpose                                                                  |
+|------------------|-----------------|-----|-------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| `health/bridge`  | bridge → UI     | 0 (retained) | `{ "ts": 1716..., "ports": [{ "name": "NXT-1", "path": "COM4", "open": true }] }` | NXT bridge liveness + per-NXT serial-port state, every 3 s. See [visualizations.md](visualizations.md). |
+| `health/server`  | server → UI     | 0 (retained) | `{ "ts": 1716... }`                                                      | Session-logger/HTTP-server liveness, every 3 s.                          |
+
 ## Notes
 
 - **QoS choice**: control messages (`robot/score`, `session/*`) use QoS 1 so they survive transient broker hiccups. High-rate event streams (`robot/touch`, `robot/strike`) use QoS 0 — a dropped touch event is acceptable; latency isn't.
@@ -29,4 +36,5 @@ Single source of truth for topic names, payloads, and direction. Update this fil
 
 - `robot/*` — anything touching physical hardware (NXT motors or sensors).
 - `session/*` — recording lifecycle.
+- `health/*` — per-process liveness heartbeats for the monitor dashboard.
 - Reserve `cloud/*` for future remote-IoT bridging (see [remote-iot-shipping.md](remote-iot-shipping.md)).

@@ -1,0 +1,53 @@
+2026-06-17 17:12:41,051 INFO [ibu-kita-kartini]                 Book.java:560  | 1 sheet in C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\pdf\ibu-kita-kartini.pdf
+2026-06-17 17:12:41,219 INFO []                 Book.java:2565 | Stored /book.xml
+2026-06-17 17:12:41,220 INFO []                 Book.java:2525 | Book stored as C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.omr
+2026-06-17 17:12:41,228 INFO []                 Book.java:1929 | Book reaching PAGE on sheets:[#1]
+2026-06-17 17:12:41,230 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LOAD
+2026-06-17 17:12:41,665 INFO [ibu-kita-kartini]            SheetStub.java:1278 | Loaded image #1 2479x3508 from C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\pdf\ibu-kita-kartini.pdf
+2026-06-17 17:12:41,680 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | BINARY
+2026-06-17 17:12:42,466 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | SCALE
+2026-06-17 17:12:42,493 INFO [ibu-kita-kartini]         ScaleBuilder.java:255  | Beam  guessed height: 13 -- mid of [6..20]
+2026-06-17 17:12:42,494 INFO [ibu-kita-kartini]         ScaleBuilder.java:271  | Beam measured height: 11 -- 0.36 of [6..20] range at 272% of needed quorum
+2026-06-17 17:12:42,495 INFO [ibu-kita-kartini]         ScaleBuilder.java:401  | Normalized black jitter: 4.76 %
+2026-06-17 17:12:42,495 INFO [ibu-kita-kartini]            ScaleStep.java:65   | Scale{ interline(20,21,21) line(2,2,3) beam(11)}
+2026-06-17 17:12:42,495 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | GRID
+2026-06-17 17:12:42,973 INFO [ibu-kita-kartini]       LinesRetriever.java:1500 | Global slope: 0.00000
+2026-06-17 17:12:43,021 INFO [ibu-kita-kartini]    ClustersRetriever.java:326  | Retrieved raw line clusters: 8 of sizes [5] with interline(20,21,21)
+2026-06-17 17:12:43,180 INFO [ibu-kita-kartini]            PeakGraph.java:310  | Systems: #1[1, 2] #2[3, 4] #3[5, 6] #4[7, 8]
+2026-06-17 17:12:43,711 INFO [ibu-kita-kartini]        SystemManager.java:779  | 1 part along 4 systems
+2026-06-17 17:12:43,712 INFO [ibu-kita-kartini]                 Book.java:543  | Created scores: [{Score 1}]
+2026-06-17 17:12:43,713 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | HEADERS
+2026-06-17 17:12:45,108 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | STEM_SEEDS
+2026-06-17 17:12:45,266 INFO [ibu-kita-kartini]        StemSeedsStep.java:86   | stem(3 max:3)
+2026-06-17 17:12:45,322 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | BEAMS
+2026-06-17 17:12:49,060 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LEDGERS
+2026-06-17 17:12:49,237 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | HEADS
+2026-06-17 17:12:54,539 INFO [ibu-kita-kartini]        HeadSeedTally.java:235  | Scale information: HeadSeeds{NOTEHEAD_BLACK[L:-0.5]}
+2026-06-17 17:12:54,540 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | STEMS
+2026-06-17 17:12:55,171 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | REDUCTION
+2026-06-17 17:12:55,289 INFO [ibu-kita-kartini]        ReductionStep.java:105  | Stems free length median value: 74 pixels, 3.5 interlines
+2026-06-17 17:12:55,293 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CUE_BEAMS
+2026-06-17 17:12:55,293 INFO [ibu-kita-kartini]         CueBeamsStep.java:81   | Step CUE_BEAMS is skipped because small heads switch is off
+2026-06-17 17:12:55,293 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | TEXTS
+2026-06-17 17:12:56,286 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | MEASURES
+2026-06-17 17:12:56,296 INFO [ibu-kita-kartini]                 Page.java:307  | 18 raw measures: [5 in system#1, 5 in system#2, 5 in system#3, 3 in system#4]
+2026-06-17 17:12:56,296 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CHORDS
+2026-06-17 17:12:56,317 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | CURVES
+2026-06-17 17:12:57,301 INFO [ibu-kita-kartini]         SlursBuilder.java:240  | Slurs: 0
+2026-06-17 17:12:57,318 INFO [ibu-kita-kartini]      SegmentsBuilder.java:155  | Segments: 23
+2026-06-17 17:12:57,332 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | SYMBOLS
+2026-06-17 17:12:57,786 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | LINKS
+2026-06-17 17:12:57,847 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | RHYTHMS
+2026-06-17 17:12:57,925 INFO [ibu-kita-kartini]       StepMonitoring.java:98   | PAGE
+2026-06-17 17:12:57,933 INFO [ibu-kita-kartini]                 Book.java:2584 | Book{ibu-kita-kartini} storing
+2026-06-17 17:12:57,984 INFO [ibu-kita-kartini]                 Book.java:2565 | Stored /book.xml
+2026-06-17 17:12:58,102 INFO [ibu-kita-kartini]           DataHolder.java:348  | Stored /sheet#1/BINARY.png
+2026-06-17 17:12:58,736 INFO [ibu-kita-kartini]                Sheet.java:1583 | Stored /sheet#1/sheet#1.xml
+2026-06-17 17:12:58,736 INFO [ibu-kita-kartini]                 Book.java:2525 | Book stored as C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.omr
+2026-06-17 17:12:58,793 INFO [ibu-kita-kartini]            SheetStub.java:1655 | Sheet disposed
+2026-06-17 17:12:58,879 INFO [ibu-kita-kartini]                 Book.java:2050 | End of Stub#1
+2026-06-17 17:12:58,881 INFO [ibu-kita-kartini]                 Book.java:2057 | End of Book{ibu-kita-kartini}
+2026-06-17 17:12:59,327 INFO [ibu-kita-kartini]            SheetStub.java:1000 | Loaded /sheet#1/sheet#1.xml
+2026-06-17 17:13:00,156 INFO [ibu-kita-kartini]      PartwiseBuilder.java:2706 | Exporting sheet(s): [#1]
+2026-06-17 17:13:00,285 INFO [ibu-kita-kartini]        ScoreExporter.java:164  | Score ibu-kita-kartini exported to C:\Users\HP\Documents\EngPhys\SemesterVI\TF4017 Industrial Internet of Things\iiot-capstone-01\scores\mxl\ibu-kita-kartini.mxl
+2026-06-17 17:13:00,334 INFO [ibu-kita-kartini]                Score.java:181  | Closing {Score 1}

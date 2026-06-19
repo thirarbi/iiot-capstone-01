@@ -3,8 +3,10 @@ const fs   = require('fs');
 const path = require('path');
 const mqtt = require('mqtt');
 
-// Start the MQTT broker — exports the actual ports in use
-const { broker_port: MQTT_TCP_PORT, websocket_port: MQTT_WS_PORT } = require('./broker');
+// server.js does NOT start the broker itself — run `npm run broker` in a
+// separate process. Both connect to the broker over these same ports.
+const MQTT_TCP_PORT = Number(process.env.MQTT_PORT    || 1883);
+const MQTT_WS_PORT  = Number(process.env.MQTT_WS_PORT || 8883);
 
 const HOST = 'localhost';
 const PORT = Number(process.env.HTTP_PORT || 8080);
@@ -93,7 +95,19 @@ logger.on('connect', () => {
   console.log('📝 Session logger connected to local broker');
   logger.subscribe(['session/begin', 'session/end', 'robot/touch'], { qos: 1 });
   broadcastStatus(logger);  // clear any stale retained status from a previous run
+  startHeartbeat();
 });
+
+// Health heartbeat — retained so the Web UI's monitor dashboard knows the
+// server/logger process is alive. See docs/visualizations.md.
+const HEARTBEAT_MS = 3000;
+let heartbeatTimer = null;
+function startHeartbeat() {
+  if (heartbeatTimer) return;
+  const beat = () => logger.publish('health/server', JSON.stringify({ ts: Date.now() }), { retain: true });
+  beat();
+  heartbeatTimer = setInterval(beat, HEARTBEAT_MS);
+}
 
 logger.on('error', (err) => console.error('❌ Session logger MQTT error:', err.message));
 

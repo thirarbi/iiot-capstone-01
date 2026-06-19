@@ -4,7 +4,9 @@
       "Bash(ls \"C:\\\\Users\\\\HP\\\\.claude\\\\projects\\\\c--Users-HP-Documents-EngPhys-SemesterVI-TF4017-Industrial-Internet-of-Things-iiot-capstone-01\\\\memory\" 2>&1)",
       "Read(//c/Users/HP/.claude/projects/c--Users-HP-Documents-EngPhys-SemesterVI-TF4017-Industrial-Internet-of-Things-iiot-capstone-01/**)",
       "Bash(node --check src/nxt_bridge.js)",
-      "Bash(node --check src/server.js)"
+      "Bash(node --check src/server.js)",
+      "Bash(node src/server.js)",
+      "Bash(netstat -ano)"
     ]
   }
 }

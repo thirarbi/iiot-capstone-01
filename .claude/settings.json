@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tasklist //FI \"PID eq 9980\")",
+      "Bash(taskkill //PID 9980 //F)",
+      "Bash(echo \"exit code: $?\")",
+      "Bash(npm ls *)",
+      "Bash(node -e \"console.log\\(require.resolve\\('concurrently'\\)\\)\")",
+      "Bash(taskkill //PID 13572 //F)",
+      "Bash(node --check public/script.js)",
+      "Bash(npm --version)",
+      "Bash(node-red --version)",
+      "Read(//c/Users/HP/.node-red/**)",
+      "Bash(node -e ' *)",
+      "Bash(node build-capstone.js)",
+      "Bash(node -e 'JSON.parse\\(require\\(\"fs\"\\).readFileSync\\(\"./flows.json\",\"utf8\"\\)\\); console.log\\(\"flows.json is valid JSON\"\\);')",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(node-red > /tmp/cap-nodered.log 2>&1 & *)",
+      "Bash(grep -v \"credentials\\\\|Projects disabled\\\\|system-generated\\\\|credentialSecret\\\\|recoverable\\\\|chosen key\\\\|^-\\\\+$\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:1880/ui/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:1880/)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}
